@@ -1,6 +1,6 @@
 /*
  * Amiga Generic Set - set of libraries and includes to ease sw development for all Amiga platforms
- * Copyright (C) 2001-2011 Tomasz Wiszkowski Tomasz.Wiszkowski at gmail.com.
+ * Copyright (C) 2004-2008 Tomasz Wiszkowski Tomasz.Wiszkowski at gmail.com.
  * 
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -20,11 +20,12 @@
 #ifndef _GENERICMUI_H_
 #define _GENERICMUI_H_
 
+#ifndef __linux__
+
 #include "GenericOOP.h"
 #include "LibrarySpool.h"
 #include <intuition/classes.h>
 #include <libclass/muimaster.h>
-#include <intuition/classusr.h>
 
 #undef MUI_MakeObject
 #define MUI_MakeObject(a, b...) MUIMaster->MUI_MakeObjectA(a, ARRAY(b))
@@ -64,9 +65,10 @@ namespace GenNS
    {
    protected:
 
-      Object                 *MUI_MakeObjectX(long Name, ...);
-      Object                 *MUI_NewObject(char* Name, unsigned long FirstTag, ...);
+      iptr                   *MUI_MakeObjectX(iptr Name, ...);
+      iptr                   *MUI_NewObject(char* Name, iptr FirstTag, ...);
    };
 };
 
+#endif /* __linux__ */
 #endif //_GENERICMUI_H_

@@ -1,6 +1,6 @@
 /*
  * Amiga Generic Set - set of libraries and includes to ease sw development for all Amiga platforms
- * Copyright (C) 2001-2011 Tomasz Wiszkowski Tomasz.Wiszkowski at gmail.com.
+ * Copyright (C) 2004-2008 Tomasz Wiszkowski Tomasz.Wiszkowski at gmail.com.
  * 
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -66,7 +66,7 @@ struct PathNode;
    FUNC2(BPTR,             Open,             5, const char*,      name,    d1, int32,           access,  d2);
    FUNC1(int32,            Close,            6, BPTR,             file,    d1);
    FUNC3(int32,            Read,             7, BPTR,             file,    d1, void*,           buffer,  d2, int32,           length,  d3);
-   FUNC3(int32,            Write,            8, BPTR,             file,    d1, void*,           buffer,  d2, int32,           length,  d3);
+   FUNC3(int32,            Write,            8, BPTR,             file,    d1, const void*,     buffer,  d2, int32,           length,  d3);
    FUNC0(BPTR,             Input,            9);
    FUNC0(BPTR,             Output,          10);
    FUNC3(int32,            Seek,            11, BPTR,             file,    d1, int32,           pos,     d2, int32,           offset,  d3);
@@ -227,7 +227,7 @@ struct PathNode;
    FUNC3(Segment*,         FindSegment,    130, const char*,      name,    d1, Segment*,        segment, d2, int32,           sys,     d3);
    FUNC1(int32,            RemSegment,     131, Segment*,         segment, d1);
    FUNC1(int32,            CheckSignal,    132, int32,            mask,    d1);
-   FUNC3(RDArgs*,          ReadArgs,       133, const char*,      tmplate, d1, int32*,          array,   d2, RDArgs*,         args,    d3);
+   FUNC3(RDArgs*,          ReadArgs,       133, const char*,      tmplate, d1, void**,          array,   d2, RDArgs*,         args,    d3);
    FUNC2(int32,            FindArg,        134, const char*,      tmplate, d1, const char*,     keyword, d2);
    FUNC3(int32,            ReadItem,       135, const char*,      name,    d1, int32,           maxchrs, d2, CSource*,        csource, d3);
    FUNC2(int32,            StrToLong,      136, const char*,      string,  d1, int32*,          value,   d2);

@@ -1,6 +1,6 @@
 /*
  * Amiga Generic Set - set of libraries and includes to ease sw development for all Amiga platforms
- * Copyright (C) 2001-2011 Tomasz Wiszkowski Tomasz.Wiszkowski at gmail.com.
+ * Copyright (C) 2004-2008 Tomasz Wiszkowski Tomasz.Wiszkowski at gmail.com.
  * 
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -106,7 +106,7 @@ namespace GenNS
       {
          pSync.ObtainWrite();             // make sure nobody accesses us atm
 
-         *resource = *hOther.resource;    // copy elements, dont bother how.
+         resource = hOther.resource;      // copy elements, dont bother how.
 
          pSync.Release();                 // this is the obtained one :)
          return *this;

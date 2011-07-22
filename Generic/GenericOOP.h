@@ -1,6 +1,6 @@
 /*
  * Amiga Generic Set - set of libraries and includes to ease sw development for all Amiga platforms
- * Copyright (C) 2001-2011 Tomasz Wiszkowski Tomasz.Wiszkowski at gmail.com.
+ * Copyright (C) 2004-2008 Tomasz Wiszkowski Tomasz.Wiszkowski at gmail.com.
  * 
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -20,9 +20,10 @@
 #ifndef _GENERIC_OOP_H_
 #define _GENERIC_OOP_H_
 
+#ifndef __linux__
+
 #include "Types.h"
 #include <intuition/classes.h>
-#include <intuition/classusr.h>
 
 namespace GenNS
 {
@@ -31,14 +32,15 @@ namespace GenNS
    public:
                               GenericOOP();
       virtual                ~GenericOOP();  
-      virtual uint32          DoMtd(uint32* pObject, uint32 *pMsg);
-      virtual uint32          DoSuperMtd(IClass *pClass, uint32* pObject, uint32 *pMsg);
-      virtual uint32         *NewObj(char* Name, uint32 FirstTag, ...);
-      virtual uint32         *NewObj(Class* cls, uint32 FirstTag, ...);
-      virtual void            DisposeObj(uint32 *obj);
-      virtual void            AddChildObj(uint32 *parent, uint32 *child);
-      virtual void            RemChildObj(uint32 *parent, uint32 *child);
+      virtual iptr            DoMtd(iptr *pObject, iptr *pMsg);
+      virtual iptr            DoSuperMtd(class IClass *pClass, iptr *pObject, iptr *pMsg);
+      virtual iptr           *NewObj(char* Name, iptr FirstTag, ...);
+      virtual iptr           *NewObj(Class* cls, iptr FirstTag, ...);
+      virtual void            DisposeObj(iptr *obj);
+      virtual void            AddChildObj(iptr *parent, iptr *child);
+      virtual void            RemChildObj(iptr *parent, iptr *child);
    };
 };
+#endif /* __linux__ */
 #endif
 

@@ -1,22 +1,3 @@
-/*
- * Amiga Generic Set - set of libraries and includes to ease sw development for all Amiga platforms
- * Copyright (C) 2001-2011 Tomasz Wiszkowski Tomasz.Wiszkowski at gmail.com.
- * 
- * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU Lesser General Public
- * License as published by the Free Software Foundation; either
- * version 2.1 of the License, or (at your option) any later version.
- * 
- * This library is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Lesser General Public License for more details.
- * 
- * You should have received a copy of the GNU Lesser General Public
- * License along with this library; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
- */
-
 #ifndef _GENERIC_HOOKATTRT_H
 #define _GENERIC_HOOKATTRT_H
 
@@ -84,8 +65,8 @@ namespace GenNS
           */
          HookAttrT()
          {
-            ASSERT(sizeof(T1) == sizeof(uint));
-            ASSERT(sizeof(T2) == sizeof(uint));
+            ASSERT(sizeof(T1) == sizeof(iptr));
+            ASSERT(sizeof(T2) == sizeof(iptr));
             FHook = 0;
          }
 
@@ -95,8 +76,8 @@ namespace GenNS
           */
          HookAttrT(const Hook* h)
          {
-            ASSERT(sizeof(T1) == sizeof(uint));
-            ASSERT(sizeof(T2) == sizeof(uint));
+            ASSERT(sizeof(T1) == sizeof(iptr));
+            ASSERT(sizeof(T2) == sizeof(iptr));
             FHook = h;
          }
 
@@ -118,7 +99,7 @@ namespace GenNS
           * \brief Use this method to call hook with adequate parameters.
           * \sa operator ()(T1, T2)
           */
-         uint           Call(T1 object, T2 message)
+         iptr           Call(T1 object, T2 message) const
          {
             ASSERT(Utility != 0);
             if (FHook == 0) 
@@ -130,7 +111,7 @@ namespace GenNS
           * \brief Verifies whether hook is initialized. 
           * \details You don't need to check this before calling the hook. The checks are done automatically.
           */
-         bool           IsValid()
+         bool           IsValid() const
          {
             return (FHook != 0);
          }
@@ -145,7 +126,7 @@ namespace GenNS
           *    // ...
           * \endcode
           */
-         static uint   Call(const Hook* pHook, T1 object, T2 message)
+         static iptr   Call(const Hook* pHook, T1 object, T2 message)
          {
             ASSERT(Utility != 0);
             if (pHook == 0) 
@@ -157,7 +138,7 @@ namespace GenNS
           * \brief Use this method to call hook with adequate parameters.
           * \sa Call(T1, T2)
           */
-         uint operator () (T1 object, T2 message)
+         iptr operator () (T1 object, T2 message) const
          {
             ASSERT(Utility != 0);
             if (FHook == 0) 

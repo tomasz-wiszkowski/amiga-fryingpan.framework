@@ -1,6 +1,6 @@
 /*
  * Amiga Generic Set - set of libraries and includes to ease sw development for all Amiga platforms
- * Copyright (C) 2001-2011 Tomasz Wiszkowski Tomasz.Wiszkowski at gmail.com.
+ * Copyright (C) 2004-2008 Tomasz Wiszkowski Tomasz.Wiszkowski at gmail.com.
  * 
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -42,22 +42,22 @@
    #define XGETD6(var) asm("mov.l d6,%0\n\t" : "=g"(var))
    #define XGETD7(var) asm("mov.l d7,%0\n\t" : "=g"(var))
    
-   #define GETA0(var) ({register long* ___varA0 asm("a0"); ((long*)var) = ___varA0;})
-   #define GETA1(var) ({register long* ___varA1 asm("a1"); ((long*)var) = ___varA1;})
-   #define GETA2(var) ({register long* ___varA2 asm("a2"); ((long*)var) = ___varA2;})
-   #define GETA3(var) ({register long* ___varA3 asm("a3"); ((long*)var) = ___varA3;})
-   #define GETA4(var) ({register long* ___varA4 asm("a4"); ((long*)var) = ___varA4;})
-   #define GETA5(var) ({register long* ___varA5 asm("a5"); ((long*)var) = ___varA5;})
-   #define GETA6(var) ({register long* ___varA6 asm("a6"); ((long*)var) = ___varA6;})
-   #define GETA7(var) ({register long* ___varA7 asm("a7"); ((long*)var) = ___varA7;})
-   #define GETD0(var) ({register long ___varD0 asm("d0"); ((long*)var) = ___varD0;})
-   #define GETD1(var) ({register long ___varD1 asm("d1"); ((long*)var) = ___varD1;})
-   #define GETD2(var) ({register long ___varD2 asm("d2"); ((long*)var) = ___varD2;})
-   #define GETD3(var) ({register long ___varD3 asm("d3"); ((long*)var) = ___varD3;})
-   #define GETD4(var) ({register long ___varD4 asm("d4"); ((long*)var) = ___varD4;})
-   #define GETD5(var) ({register long ___varD5 asm("d5"); ((long*)var) = ___varD5;})
-   #define GETD6(var) ({register long ___varD6 asm("d6"); ((long*)var) = ___varD6;})
-   #define GETD7(var) ({register long ___varD7 asm("d7"); ((long*)var) = ___varD7;})
+   #define GETA0(var) ({register iptr* ___varA0 asm("a0"); ((iptr*)var) = ___varA0;})
+   #define GETA1(var) ({register iptr* ___varA1 asm("a1"); ((iptr*)var) = ___varA1;})
+   #define GETA2(var) ({register iptr* ___varA2 asm("a2"); ((iptr*)var) = ___varA2;})
+   #define GETA3(var) ({register iptr* ___varA3 asm("a3"); ((iptr*)var) = ___varA3;})
+   #define GETA4(var) ({register iptr* ___varA4 asm("a4"); ((iptr*)var) = ___varA4;})
+   #define GETA5(var) ({register iptr* ___varA5 asm("a5"); ((iptr*)var) = ___varA5;})
+   #define GETA6(var) ({register iptr* ___varA6 asm("a6"); ((iptr*)var) = ___varA6;})
+   #define GETA7(var) ({register iptr* ___varA7 asm("a7"); ((iptr*)var) = ___varA7;})
+   #define GETD0(var) ({register iptr ___varD0 asm("d0"); ((iptr*)var) = ___varD0;})
+   #define GETD1(var) ({register iptr ___varD1 asm("d1"); ((iptr*)var) = ___varD1;})
+   #define GETD2(var) ({register iptr ___varD2 asm("d2"); ((iptr*)var) = ___varD2;})
+   #define GETD3(var) ({register iptr ___varD3 asm("d3"); ((iptr*)var) = ___varD3;})
+   #define GETD4(var) ({register iptr ___varD4 asm("d4"); ((iptr*)var) = ___varD4;})
+   #define GETD5(var) ({register iptr ___varD5 asm("d5"); ((iptr*)var) = ___varD5;})
+   #define GETD6(var) ({register iptr ___varD6 asm("d6"); ((iptr*)var) = ___varD6;})
+   #define GETD7(var) ({register iptr ___varD7 asm("d7"); ((iptr*)var) = ___varD7;})
 
 #elif defined(__MORPHOS__)
 #elif defined(__AROS__)

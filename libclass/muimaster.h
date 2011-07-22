@@ -1,6 +1,6 @@
 /*
  * Amiga Generic Set - set of libraries and includes to ease sw development for all Amiga platforms
- * Copyright (C) 2001-2011 Tomasz Wiszkowski Tomasz.Wiszkowski at gmail.com.
+ * Copyright (C) 2004-2008 Tomasz Wiszkowski Tomasz.Wiszkowski at gmail.com.
  * 
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -71,7 +71,7 @@ struct Region;
       PROC2(                  MUI_Redraw,            17, Object*,          object,  a0, uint32,             flags,   d0);
       FUNC5(MUI_CustomClass*, MUI_CreateCustomClass, 18, Library*,         base,    a0, const char*,        name,    a1, MUI_CustomClass*,superclass, a2, int32,        datasize,   d0, void*,        dispatcher,    a3);
       FUNC1(bool,             MUI_DeleteCustomClass, 19, MUI_CustomClass*, cclass,  a0);
-      FUNC2(Object*,          MUI_MakeObjectA,       20, uint32,           type,    d0, uint32*,            params,  a0);
+      FUNC2(Object*,          MUI_MakeObjectA,       20, uint32,           type,    d0, iptr*,              params,  a0);
 #ifdef __AMIGAOS4__
       PROC0(                  MUI_dummy5,            20);
 #endif

@@ -1,6 +1,6 @@
 /*
  * Amiga Generic Set - set of libraries and includes to ease sw development for all Amiga platforms
- * Copyright (C) 2001-2011 Tomasz Wiszkowski Tomasz.Wiszkowski at gmail.com.
+ * Copyright (C) 2004-2008 Tomasz Wiszkowski Tomasz.Wiszkowski at gmail.com.
  * 
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -32,11 +32,11 @@ void *MUICustomClass::getDispatcher()
    return (void*)&FDispatchCaller;
 }
 
-uint MUICustomClass::dispatch(IClass *cls, Object* obj, unsigned long *msg)
+iptr MUICustomClass::dispatch(IClass *cls, Object* obj, iptr *msg)
 {
    GenericOOP       *co;
    GenericOOP      **ptr;
-   unsigned long     ret = 0;
+   iptr     ret = 0;
 
    /*
     * man, this was tricky.
@@ -64,7 +64,7 @@ uint MUICustomClass::dispatch(IClass *cls, Object* obj, unsigned long *msg)
                ASSERT(NULL != ptr);
                if (NULL != ptr)
                   *ptr  = co;
-               ret = (unsigned long)obj;
+               ret = (iptr)obj;
             }
          }
          break;
@@ -121,10 +121,10 @@ MUICustomClass::~MUICustomClass()
       MUIMaster->MUI_DeleteCustomClass(pMUIClass);
 }
    
-Object *MUICustomClass::Create(unsigned long lTag1, ...)
+Object *MUICustomClass::Create(iptr lTag1, ...)
 {
    va_list        ap;
-   unsigned long *params = new unsigned long [128];
+   iptr *params = new iptr [128];
    int            pos = 0;
    
    va_start(ap, lTag1);
@@ -133,8 +133,8 @@ Object *MUICustomClass::Create(unsigned long lTag1, ...)
 
    while (params[pos++] != 0)
    {
-      params[pos++]    = va_arg(ap, unsigned long);      // data
-      params[pos  ]    = va_arg(ap, unsigned long);      // tag
+      params[pos++]    = va_arg(ap, iptr);      // data
+      params[pos  ]    = va_arg(ap, iptr);      // tag
       ASSERT(pos < 128);
    }
 
@@ -149,35 +149,35 @@ Object *MUICustomClass::Create(unsigned long lTag1, ...)
 
 #if defined (__AROS__) || defined (__AMIGAOS4__)
 
-unsigned long MUICustomClass::FDispatchCaller(IClass *pClass, Object* pObject, unsigned long *pMessage)
+iptr MUICustomClass::FDispatchCaller(IClass *pClass, Object* pObject, iptr *pMessage)
 {    
    return ((MUICustomClass*)pClass->cl_UserData)->dispatch(pClass, pObject, pMessage);
 }
 
 #elif defined (__MORPHOS__)
 
-unsigned long MUICustomClass::FDispatchCallerFunc()
+iptr MUICustomClass::FDispatchCallerFunc()
 {
    IClass        *pClass   = (IClass*)REG_A0;
    Object        *pObject  = (Object*)REG_A2;
-   unsigned long *pMessage = (unsigned long*)REG_A1;
+   iptr *pMessage = (iptr*)REG_A1;
 
    return ((MUICustomClass*)pClass->cl_UserData)->dispatch(pClass, pObject, pMessage);
 }
    
-const unsigned long MUICustomClass::FDispatchCaller[2] = 
+const iptr MUICustomClass::FDispatchCaller[2] = 
 {
    0xff000000, 
-   (unsigned long)&FDispatchCallerFunc 
+   (iptr)&FDispatchCallerFunc 
 };
 
 #elif defined (__mc68000)
 
-unsigned long MUICustomClass::FDispatchCaller()
+iptr MUICustomClass::FDispatchCaller()
 {
    IClass        *pClass;
    Object        *pObject;
-   unsigned long *pMessage;
+   iptr *pMessage;
 
    asm volatile ("mov.l a0,%0\n\t"
                  "mov.l a1,%1\n\t"

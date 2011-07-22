@@ -1,6 +1,6 @@
 /*
  * Amiga Generic Set - set of libraries and includes to ease sw development for all Amiga platforms
- * Copyright (C) 2001-2011 Tomasz Wiszkowski Tomasz.Wiszkowski at gmail.com.
+ * Copyright (C) 2004-2008 Tomasz Wiszkowski Tomasz.Wiszkowski at gmail.com.
  * 
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -24,7 +24,7 @@
  * \file IHook.h
  * \brief This file defines a \b Hook interface - a good base for hooks of any kind.
  * \details If you want to toss call a specific function with specific static or dynamic args every time a hook fires this is something you are looking for. 
- * Simply override the uint ::Call(uint a1, uint a2) method and you're all set.
+ * Simply override the iptr ::Call(iptr a1, iptr a2) method and you're all set.
  */
 
 #include "Generic.h"
@@ -40,13 +40,13 @@ namespace GenNS
    /**
     * \interface IHook
     * \brief Interface to Utility \b Hooks.
-    * \details This interface handles all the low-level handling of your hooks. Actually it only forwards the two parameters passed to the hook further to the overridden Call(uint, uint) function.\n
-    * To use this interface, create a new class that derives from ::IHook and implement a virtual Call(uint, uint) function, e.g.:
+    * \details This interface handles all the low-level handling of your hooks. Actually it only forwards the two parameters passed to the hook further to the overridden Call(iptr, iptr) function.\n
+    * To use this interface, create a new class that derives from ::IHook and implement a virtual Call(iptr, iptr) function, e.g.:
     * \code
     * class MyHook : public IHook
     * {
     * protected:
-    *    virtual uint Call(uint p1, uint p2)
+    *    virtual iptr Call(iptr p1, iptr p2)
     *    {
     *       return request("Info", "Parameters passed: %lx and %lx", "Okay", ARRAY(p1, p2));
     *    }
@@ -69,7 +69,7 @@ namespace GenNS
    private:
       Hook                    hHook; 
 #ifdef __MORPHOS__
-      unsigned long           hMOSCall[2];
+      iptr           hMOSCall[2];
 #endif
 
    public:
@@ -79,13 +79,13 @@ namespace GenNS
        * \arg a1 - Object parameter passed to CallHookPkt()
        * \arg a2 - Message parameter passed to CallHookPkt()
        */
-      virtual uint Call(uint a1, uint a2) = 0;
+      virtual iptr Call(iptr a1, iptr a2) = 0;
 
    protected:
 #if defined (__AROS__) || defined (__AMIGAOS4__)
-      static uint subCaller(Hook *pHook, uint pObject, uint pMessage);
+      static iptr subCaller(Hook *pHook, iptr pObject, iptr pMessage);
 #elif defined (__MORPHOS__) || defined(__mc68000)
-      static uint subCaller();
+      static iptr subCaller();
 #endif
 
    private:

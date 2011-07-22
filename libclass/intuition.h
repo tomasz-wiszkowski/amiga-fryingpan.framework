@@ -1,30 +1,11 @@
-/*
- * Amiga Generic Set - set of libraries and includes to ease sw development for all Amiga platforms
- * Copyright (C) 2001-2011 Tomasz Wiszkowski Tomasz.Wiszkowski at gmail.com.
- * 
- * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU Lesser General Public
- * License as published by the Free Software Foundation; either
- * version 2.1 of the License, or (at your option) any later version.
- * 
- * This library is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Lesser General Public License for more details.
- * 
- * You should have received a copy of the GNU Lesser General Public
- * License along with this library; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
- */
-
 #ifndef _LIBCLASS_INTUTION_H_
 #define _LIBCLASS_INTUTION_H_
-#define  CLIB_INTUITION_PROTOS_H
 
-#if defined (_PROTO_INTUITION_H) || defined (PROTO_INTUITION_H)
+#if defined (CLIB_INTUITION_PROTOS_H) || (_PROTO_INTUITION_H) || defined (PROTO_INTUITION_H)
 #error "Please remove proto/intuition includes first!"
 #endif
 
+#define  CLIB_INTUITION_PROTOS_H
 #define _PROTO_INTUITION_H
 #define PROTO_INTUITION_H
 
@@ -154,7 +135,7 @@ extern class IntuitionIFace *Intuition;
       PROC1(DisposeObject, 107, void *, object, a0);
       FUNC2(uint32, SetAttrsA, 108, void *, object, a0, const struct TagItem *, tagList, a1);
       PROC0(dummy9, 0);
-      FUNC3(uint32, GetAttr, 109, uint32, attrID, d0, void *, object, a0, uint32 *, storagePtr, a1);
+      FUNC3(uint32, GetAttr, 109, uint32, attrID, d0, void *, object, a0, iptr *, storagePtr, a1);
       FUNC4(uint32, SetGadgetAttrsA, 110, struct Gadget *, gadget, a0, struct Window *, window, a1, struct Requester *, requester, a2, const struct TagItem *, tagList, a3);
       PROC0(dummy10, 0);
       FUNC1(void *, NextObject, 111, void *, objectPtrPtr, a0);
@@ -181,7 +162,7 @@ extern class IntuitionIFace *Intuition;
       PROC6(ScreenPosition, 132, struct Screen *, screen, a0, uint32, flags, d0, int32, x1, d1, int32, y1, d2, int32, x2, d3, int32, y2, d4);
       PROC7(ScrollWindowRaster, 133, struct Window *, win, a1, int16, dx, d0, int16, dy, d1, int16, xMin, d2, int16, yMin, d3, int16, xMax, d4, int16, yMax, d5);
       PROC2(LendMenus, 134, struct Window *, fromwindow, a0, struct Window *, towindow, a1);
-      FUNC4(uint32, DoGadgetMethodA, 135, struct Gadget *, gad, a0, struct Window *, win, a1, struct Requester *, req, a2, uint32*, message, a3);
+      FUNC4(iptr, DoGadgetMethodA, 135, struct Gadget *, gad, a0, struct Window *, win, a1, struct Requester *, req, a2, iptr*, message, a3);
       PROC0(dummy14, 0);
       PROC2(SetWindowPointerA, 136, struct Window *, win, a0, const struct TagItem *, taglist, a1);
       PROC0(dummy15, 0);

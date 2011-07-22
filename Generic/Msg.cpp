@@ -1,54 +1,34 @@
-/*
- * Amiga Generic Set - set of libraries and includes to ease sw development for all Amiga platforms
- * Copyright (C) 2001-2011 Tomasz Wiszkowski Tomasz.Wiszkowski at gmail.com.
- * 
- * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU Lesser General Public
- * License as published by the Free Software Foundation; either
- * version 2.1 of the License, or (at your option) any later version.
- * 
- * This library is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Lesser General Public License for more details.
- * 
- * You should have received a copy of the GNU Lesser General Public
- * License along with this library; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
- */
-
 #include "Msg.h"
 #include <libclass/exec.h>
-#include "LibrarySpool.h"
+#include "Port.h"
 
 using namespace GenNS;
 
-GenNS::Msg::Msg(bool ASynchronous, unsigned long ACmd, void* AData)
+GenNS::Msg::Msg(const GenNS::Port *reply)
 {
-   bSync = ASynchronous;
-   lCmd  = ACmd;
-   pData = AData;
-   pPort = 0;
-   mn_Node.ln_Name = (char*)this;
-   if (bSync)
-   {
-      pPort = Exec->CreateMsgPort();
-      mn_ReplyPort = pPort;
-   }
+    if (reply != 0)
+	mn_ReplyPort = const_cast<MsgPort*>(static_cast<const MsgPort*>(reply));
+    else
+	mn_ReplyPort = 0;
+
+    /*
+    ** initially message has no state (not ready, not cancelled, not pending).
+    */
+    mn_Node.ln_Type = NT_UNKNOWN;
 }
 
 GenNS::Msg::~Msg()
 {
-   if (pPort) 
-   {
-      Exec->DeleteMsgPort(pPort);
-   }
+}
+	
+void GenNS::Msg::Dispose()
+{
+    delete this;
 }
 
-void GenNS::Msg::Reply(unsigned long AResult)
+void GenNS::Msg::Reply()
 {
-   lResult = AResult;
-   if (bSync)
+   if (mn_ReplyPort != 0)
    {
       Exec->ReplyMsg(this);
    }
@@ -58,22 +38,47 @@ void GenNS::Msg::Reply(unsigned long AResult)
    }
 }
 
-uint32 GenNS::Msg::WaitFor()
+bool GenNS::Msg::WaitFor()
 {
-   if (bSync)
-   {
-      Exec->WaitPort(pPort);
-      return lResult;
-   }
-   return 0;
+    if (mn_ReplyPort != 0)
+    {
+	if (IsPending())
+	    Exec->WaitPort(mn_ReplyPort);
+	return IsReady();
+    }
+    return false;
 }
 
-uint32 GenNS::Msg::GetCommand()
+bool GenNS::Msg::Cancel()
 {
-   return lCmd;
+    Exec->Forbid();
+    if (IsPending())
+    {
+	Exec->Remove(&mn_Node);
+	mn_Node.ln_Type = NT_FREEMSG;
+    }
+    Exec->Permit();
+    return IsCancelled();
 }
 
-void *GenNS::Msg::GetData()
+bool GenNS::Msg::IsPending()
 {
-   return pData;
+    return (mn_Node.ln_Type == NT_MESSAGE);
 }
+
+bool GenNS::Msg::IsReplied()
+{
+    return (mn_Node.ln_Type == NT_REPLYMSG);
+}
+
+bool GenNS::Msg::IsReady()
+{
+    return (!IsPending());
+}
+
+bool GenNS::Msg::IsCancelled()
+{
+    return (mn_Node.ln_Type == NT_FREEMSG);
+}
+
+

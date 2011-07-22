@@ -1,6 +1,6 @@
 /*
  * Amiga Generic Set - set of libraries and includes to ease sw development for all Amiga platforms
- * Copyright (C) 2001-2011 Tomasz Wiszkowski Tomasz.Wiszkowski at gmail.com.
+ * Copyright (C) 2004-2008 Tomasz Wiszkowski Tomasz.Wiszkowski at gmail.com.
  * 
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -25,7 +25,7 @@
 
 struct LibInitStruct
 {
-   unsigned long  LibSize;
+   iptr  LibSize;
    void          *FuncTable;
    void          *DataTable;
    void           (*InitFunc)(void);
@@ -39,10 +39,10 @@ extern "C"
 
    struct Library         *LIB_Init(struct Library*, void*, struct ExecIFace*);
    struct Library         *LIB_Open(struct LibraryManagerInterface *pSelf);
-   uint                    LIB_Close(struct LibraryManagerInterface *pSelf);
-   uint                    LIB_Expunge(struct LibraryManagerInterface *pSelf);
-   uint                    LIB_Acquire(struct LibraryManagerInterface *pSelf);
-   uint                    LIB_Release(struct LibraryManagerInterface *pSelf);
+   iptr                    LIB_Close(struct LibraryManagerInterface *pSelf);
+   iptr                    LIB_Expunge(struct LibraryManagerInterface *pSelf);
+   iptr                    LIB_Acquire(struct LibraryManagerInterface *pSelf);
+   iptr                    LIB_Release(struct LibraryManagerInterface *pSelf);
    extern struct TagItem   LIB_CreateTags[];
 #ifdef __cplusplus
 };
@@ -64,15 +64,15 @@ extern "C"
    };      
 
 #define LIB_FT_Begin                            \
-   uint LIB_FuncTable[] =                       \
+   iptr LIB_FuncTable[] =                       \
    {                                            \
-      (uint) &LIB_Acquire,                      \
-      (uint) &LIB_Release,                      \
-      (uint) 0,                                 \
-      (uint) 0,            
+      (iptr) &LIB_Acquire,                      \
+      (iptr) &LIB_Release,                      \
+      (iptr) 0,                                 \
+      (iptr) 0,            
 // }      
 
-#define LIB_FT_Function(f) (uint) &__gateway__##f,
+#define LIB_FT_Function(f) (iptr) &__gateway__##f,
 
 // { LIB_FT_End
 #define LIB_FT_End                              \

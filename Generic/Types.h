@@ -1,6 +1,6 @@
 /*
  * Amiga Generic Set - set of libraries and includes to ease sw development for all Amiga platforms
- * Copyright (C) 2001-2011 Tomasz Wiszkowski Tomasz.Wiszkowski at gmail.com.
+ * Copyright (C) 2004-2008 Tomasz Wiszkowski Tomasz.Wiszkowski at gmail.com.
  * 
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -21,6 +21,7 @@
 #define _GENERIC_TYPES_H_
 
 #include "Generic.h"
+#include <LibC/types.h>
 
 /** \file Types.h
  * \brief This file defines types for all four architectures.\n
@@ -31,37 +32,6 @@
  * default types common for all platforms.
  */
 
-typedef unsigned long long uint64;  /**< @brief unsigned 64bit integer */
-typedef unsigned long int  uint32;  /**< @brief unsigned 32bit integer */
-typedef unsigned short     uint16;  /**< @brief unsigned 16bit integer */
-typedef unsigned char      uint8;   /**< @brief unsigned 8bit integer  */
-typedef signed long long   int64;   /**< @brief signed 64bit integer */
-typedef signed long int    int32;   /**< @brief signed 32bit integer */
-typedef signed short       int16;   /**< @brief signed 16bit integer */
-typedef signed char        int8;    /**< @brief signed 8bit integer  */
-
-typedef signed long        sint;    /**< @brief architecture specific signed int: sizeof(s_int) = sizeof(void*) */
-typedef unsigned long      uint;    /**< @brief architecture specific unsigned int: sizeof(u_int) = sizeof(void*) */
-
-typedef uint*              sized_iptr; /**< @brief type returned by #SIZEARRAY to differentiate it from normal pointers */
-typedef uint*              iptr;       /**< @brief type returned by #ARRAY to differentiate it from normal pointers */
-
-/* platform specific includes */
-#if defined(__AROS__)
-typedef unsigned int size_t;
-#elif defined(__mc68000)
-typedef long unsigned int size_t;
-typedef long IPTR;
-#elif defined(__AMIGAOS4__)
-typedef unsigned int size_t;
-typedef long IPTR;
-#elif defined(__MORPHOS__)
-typedef unsigned int size_t;
-#else
-#error no size_t defined
-#endif
-
-#define PACKED __attribute__((packed))
 
 /**
  * \enum TriState 
@@ -79,9 +49,9 @@ enum TriState
 
 //! Use this macro instead of varargs. Maintains compatibility across platforms.
 #define ARRAY(arg...) \
-   ((iptr) \
+   ((iptr*) \
       ({ \
-         uint __parm[] = {arg}; \
+         iptr __parm[] = {arg}; \
          &__parm; \
       }))
 
@@ -90,9 +60,9 @@ enum TriState
  * \b Size is always stored in \b param[-1].
  */
 #define SIZEARRAY(arg...) \
-   ((sized_iptr) \
+   ((sized_iptr*) \
       ({ \
-         uint __parm[] = {0, arg}; \
+         iptr __parm[] = {0, arg}; \
          __parm[0] = sizeof(__parm) / sizeof(__parm[0]) - 1; \
          &__parm[1]; \
       }))
@@ -105,12 +75,12 @@ enum TriState
 #define TAGARRAY(arg...) \
    ((struct TagItem*) \
       ({ \
-         uint __parm[] = {arg, TAG_DONE, TAG_DONE}; \
+         iptr __parm[] = {arg, TAG_DONE, TAG_DONE}; \
          &__parm; \
        }))
 
 /**
- * \def OFFSET(type, field)
+ * \def OFFSETOF(type, field)
  * \brief this macro calculates offset of field within structure.
  */
 #define OFFSETOF(type, field) \

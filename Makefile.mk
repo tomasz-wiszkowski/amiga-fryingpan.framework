@@ -77,13 +77,13 @@ DBGDIR		= debug
 AROSRBIN 	= $(AROSBIN)/$(RELDIR)
 M68KRBIN 	= $(M68KBIN)/$(RELDIR)
 MORPHOSRBIN = $(MORPHOSBIN)/$(RELDIR)
-OS4RBIN 		= $(OS4BIN)/$(RELDIR)
+OS4RBIN 	= $(OS4BIN)/$(RELDIR)
 LINUXRBIN	= $(LINUXBIN)/$(RELDIR)
 
 AROSDBIN 	= $(AROSBIN)/$(DBGDIR)
 M68KDBIN 	= $(M68KBIN)/$(DBGDIR)
 MORPHOSDBIN = $(MORPHOSBIN)/$(DBGDIR)
-OS4DBIN 		= $(OS4BIN)/$(DBGDIR)
+OS4DBIN 	= $(OS4BIN)/$(DBGDIR)
 LINUXDBIN	= $(LINUXBIN)/$(DBGDIR)
 
 
@@ -210,13 +210,13 @@ M68K_RCCFLAGS		+= -D__BIG_ENDIAN__ -fno-baserel -noixemul -I/opt/gg/sysinc -m680
 AROS_RCCFLAGS		+= -D__LITTLE_ENDIAN__ -static -I/usr/local/i686-aros/sys-include $(GENINC) $(CCFLAGS) -Wuninitialized -O3
 MORPHOS_RCCFLAGS 	+= -D__BIG_ENDIAN__ -noixemul -I/opt/gg/mos-include $(GENINC) $(CCFLAGS) -Wuninitialized -O3 #$(P2CCFLAGS)  #-O3
 OS4_RCCFLAGS		+= -D__BIG_ENDIAN__ -noixemul -D __USE_INLINE__ -fno-enforce-eh-specs -I/SDK/Include/include_h -I/SDK/include $(GENINC) $(CCFLAGS) -Wuninitialized -O3
-LINUX_RCCFLAGS		+= $(CCFLAGS)
+LINUX_RCCFLAGS		+= $(CCFLAGS) -D__LITTLE_ENDIAN__ $(GENINC) 
 
 M68K_DCCFLAGS		+= -D__BIG_ENDIAN__ -fno-baserel -noixemul -I/opt/gg/sysinc -m68030 -m68881 $(GENINC) $(CCFLAGS) -DDBG -DDEBUG -g
 AROS_DCCFLAGS		+= -D__LITTLE_ENDIAN__ -static -I/usr/local/i686-aros/sys-include $(GENINC) $(CCFLAGS) -DDBG -DDEBUG -g
 MORPHOS_DCCFLAGS 	+= -D__BIG_ENDIAN__ -noixemul -I/opt/gg/mos-include $(GENINC) $(CCFLAGS) -DDBG -DDEBUG -g
 OS4_DCCFLAGS		+= -D__BIG_ENDIAN__ -noixemul -D __USE_INLINE__ -fno-enforce-eh-specs -I/SDK/Include/include_h -I/SDK/include $(GENINC) $(CCFLAGS) -DDBG -DDEBUG -g
-LINUX_DCCFLAGS		+= $(CCFLAGS)
+LINUX_DCCFLAGS		+= $(CCFLAGS) -D__LITTLE_ENDIAN__ -DDBG -DDEBUG  $(GENINC)
 
 #---
 
@@ -227,7 +227,7 @@ ifeq ($(BUILD_LIBRARY), 0)
 	M68K_RLINK	= $(M68K_CC) $(M68K_RCCFLAGS) -o $(M68KRBIN)/$(Program) $(M68K_RSTARTUP) $(M68KR) $(M68K_RLIBOPTS) $(LIBOPTS)
 	MOS_RLINK	= $(MORPHOS_CC) $(MORPHOS_RCCFLAGS) -o $(MORPHOSRBIN)/$(Program) $(MOS_RSTARTUP) $(MORPHOSR) $(MOS_RLIBOPTS) $(LIBOPTS)
 	OS4_RLINK	= $(OS4_CC) $(OS4_RCCFLAGS) -o $(OS4RBIN)/$(Program) $(OS4_RSTARTUP) $(OS4R) $(OS4_RLIBOPTS) $(LIBOPTS)
-	LINUX_RLINK	= $(LINUX_CC) $(LINUX_RCCFLAGS) -o $(LINUXRBIN)/$(Program) $(LINUX_RSTARTUP) $(LINUXR) $(LINUX_RLIBOPTS) $(LIBOPTS) 
+	LINUX_RLINK	= $(LINUX_CC) $(LINUX_RCCFLAGS) -o $(LINUXRBIN)/$(Program) $(LINUX_RSTARTUP) $(LINUXR) $(LINUX_RLIBOPTS) 
 
 	AROS_RSTRIP = $(AROS_STRIP) -s $(AROSRBIN)/$(Program)
 	MOS_RSTRIP 	= $(MORPHOS_STRIP) -s $(MORPHOSRBIN)/$(Program)
@@ -237,7 +237,7 @@ ifeq ($(BUILD_LIBRARY), 0)
 	M68K_DLINK	= $(M68K_CC) $(M68K_DCCFLAGS) -o $(M68KDBIN)/$(Program) $(M68K_DSTARTUP) $(M68KD) $(M68K_DLIBOPTS) $(LIBOPTS)
 	MOS_DLINK	= $(MORPHOS_CC) $(MORPHOS_DCCFLAGS) -o $(MORPHOSDBIN)/$(Program) $(MOS_DSTARTUP) $(MORPHOSD) $(MOS_DLIBOPTS) $(LIBOPTS)
 	OS4_DLINK	= $(OS4_CC) $(OS4_DCCFLAGS) -o $(OS4DBIN)/$(Program) $(OS4_DSTARTUP) $(OS4D) $(OS4_DLIBOPTS) $(LIBOPTS)
-	LINUX_DLINK	= $(LINUX_CC) $(LINUX_DCCFLAGS) -o $(LINUXDBIN)/$(Program) $(LINUX_DSTARTUP) $(LINUXD) $(LINUX_DLIBOPTS) $(LIBOPTS) 
+	LINUX_DLINK	= $(LINUX_CC) $(LINUX_DCCFLAGS) -o $(LINUXDBIN)/$(Program) $(LINUX_DSTARTUP) $(LINUXD) $(LINUX_DLIBOPTS) 
 else
 	AROS_RLINK	= $(AROS_AR) r $(AROSRBIN)/$(Program) $(AROSR) 
 	M68K_RLINK	= $(M68K_AR) r $(M68KRBIN)/$(Program) $(M68KR)
@@ -258,14 +258,16 @@ endif
 
 #---
 
+ECHO=echo
+
 #*** Section 6: Rules.
 
 
 all: $(DIRS) submakes $(TARGETS)
-	@echo "\t[  INFO] All done."
+	@$(ECHO) "\t[  INFO] All done."
 	
 clean: subcleans 
-	@echo "\t[  INFO] Cleaning up directories..."
+	@$(ECHO) "\t[  INFO] Cleaning up directories..."
 	@rm -rf $(AROSBIN)
 	@rm -rf $(M68KBIN)
 	@rm -rf $(MORPHOSBIN)
@@ -273,27 +275,27 @@ clean: subcleans
 	@rm -rf $(LINUXBIN)
 	@find . -name "*~" -exec rm '{}' \;
 	@find . -name ".*.swp" -exec rm '{}' \;
-	@echo "\t[  INFO] Cleaned up."
+	@$(ECHO) "\t[  INFO] Cleaned up."
 	
 distclean: clean
-	@echo "\t[  INFO] Cleaning up other data..."
+	@$(ECHO) "\t[  INFO] Cleaning up other data..."
 	@find . -name "cscope.*" -exec rm '{}' \;
-	@echo "\t[  INFO] All done."
+	@$(ECHO) "\t[  INFO] All done."
 
 $(DIRS):
-	@echo "\t[  INFO] Creating directory $@"
+	@$(ECHO) "\t[  INFO] Creating directory $@"
 	@mkdir -p $@
 	
 submakes:
-	@echo "\t[  SUB ] Making sub-elements... "
+	@$(ECHO) "\t[  SUB ] Making sub-elements... "
 	@$(foreach subdir, $(MAKEDIRS), $(MAKE) -C $(subdir);)
 
 subcleans:
-	@echo "\t[  SUB ] Cleaning sub-elements... "
+	@$(ECHO) "\t[  SUB ] Cleaning sub-elements... "
 	$(foreach subdir, $(MAKEDIRS), $(MAKE) -C $(subdir) clean;)
 	
 aros: $(AROSR) $(AROSD)
-	@echo "\t[  AROS] Linking... "
+	@$(ECHO) "\t[  AROS] Linking... "
 ifeq ($(NOLINK),1)
 	@cp $(AROSROBJ)/$(Program) $(AROSRBIN)
 	@cp $(AROSDOBJ)/$(Program) $(AROSDBIN)
@@ -307,7 +309,7 @@ ifdef INSTALLDIR
 endif
 
 os3: $(M68KR) $(M68KD)
-	@echo "\t[  M68K] Linking... "
+	@$(ECHO) "\t[  M68K] Linking... "
 ifeq ($(NOLINK),1)
 	@cp $(M68KROBJ)/$(Program) $(M68KRBIN)
 	@cp $(M68KDOBJ)/$(Program) $(M68KDBIN)
@@ -321,7 +323,7 @@ ifdef INSTALLDIR
 endif
 
 morphos: $(MORPHOSR) $(MORPHOSD)
-	@echo "\t[  MOS ] Linking... "
+	@$(ECHO) "\t[  MOS ] Linking... "
 ifeq ($(NOLINK),1)
 	@cp $(MORPHOSROBJ)/$(Program) $(MORPHOSRBIN)
 	@cp $(MORPHOSDOBJ)/$(Program) $(MORPHOSDBIN)
@@ -335,7 +337,7 @@ ifdef INSTALLDIR
 endif
 
 os4: $(OS4R) $(OS4D)
-	@echo "\t[  OS4 ] Linking... "
+	@$(ECHO) "\t[  OS4 ] Linking... "
 ifeq ($(NOLINK),1)
 	@cp $(OS4ROBJ)/$(Program) $(OS4RBIN)
 	@cp $(OS4DOBJ)/$(Program) $(OS4DBIN)
@@ -349,7 +351,7 @@ ifdef INSTALLDIR
 endif
 
 linux: $(LINUXR) $(LINUXD)
-	@echo "\t[  LIN ] Linking... "
+	@$(ECHO) "\t[  LIN ] Linking... "
 ifeq ($(NOLINK),1)
 	@cp $(LINUXROBJ)/$(Program) $(LINUXRBIN)
 	@cp $(LINUXDOBJ)/$(Program) $(LINUXDBIN)
@@ -366,86 +368,86 @@ endif
 #*** Platform specific targets?
 
 $(AROSROBJ)%.o:	%_aros.cpp $(DEPS)
-	@echo "\t[R AROS] CC $* "
+	@$(ECHO) "\t[R AROS] CC $* "
 	@$(AROS_CC) $(AROS_RCCFLAGS) $(CPPFLAGS) $(PREP) -o $@ -c $*_aros.cpp
 
 $(M68KROBJ)%.o:	%_os3.cpp $(DEPS)
-	@echo "\t[R M68K] CC $* "
+	@$(ECHO) "\t[R M68K] CC $* "
 	@$(M68K_CC) $(M68K_RCCFLAGS) $(CPPFLAGS) $(PREP) -o $@ -c $*_os3.cpp
 	
 $(MORPHOSROBJ)%.o: %_mos.cpp $(DEPS)
-	@echo "\t[R MOS ] CC $* "
+	@$(ECHO) "\t[R MOS ] CC $* "
 	@$(MORPHOS_CC) $(MORPHOS_RCCFLAGS) $(CPPFLAGS) $(PREP) -o $@ -c $*_mos.cpp
 
 $(OS4ROBJ)%.o: %_os4.cpp $(DEPS)
-	@echo "\t[R OS4 ] CC $* "
+	@$(ECHO) "\t[R OS4 ] CC $* "
 	@$(OS4_CC) $(OS4_RCCFLAGS) $(CPPFLAGS) $(PREP) -o $@ -c $*_os4.cpp
 	
 $(LINUXROBJ)%.o: %_linux.cpp $(DEPS)
-	@echo "\t[R LIN ] CC $* "
+	@$(ECHO) "\t[R LIN ] CC $* "
 	@$(LINUX_CC) $(LINUX_RCCFLAGS) $(CPPFLAGS) $(PREP) -o $@ -c $*_linux.cpp
 	
 $(AROSDOBJ)%.o:	%_aros.cpp $(DEPS)
-	@echo "\t[D AROS] CC $* "
+	@$(ECHO) "\t[D AROS] CC $* "
 	@$(AROS_CC) $(AROS_DCCFLAGS) $(CPPFLAGS) $(PREP) -o $@ -c $*_aros.cpp
 
 $(M68KDOBJ)%.o:	%_os3.cpp $(DEPS)
-	@echo "\t[D M68K] CC $* "
+	@$(ECHO) "\t[D M68K] CC $* "
 	@$(M68K_CC) $(M68K_DCCFLAGS) $(CPPFLAGS) $(PREP) -o $@ -c $*_os3.cpp
 	
 $(MORPHOSDOBJ)%.o: %_mos.cpp $(DEPS)
-	@echo "\t[D MOS ] CC $* "
+	@$(ECHO) "\t[D MOS ] CC $* "
 	@$(MORPHOS_CC) $(MORPHOS_DCCFLAGS) $(CPPFLAGS) $(PREP) -o $@ -c $*_mos.cpp
 
 $(OS4DOBJ)%.o: %_os4.cpp $(DEPS)
-	@echo "\t[D OS4 ] CC $* "
+	@$(ECHO) "\t[D OS4 ] CC $* "
 	@$(OS4_CC) $(OS4_DCCFLAGS) $(CPPFLAGS) $(PREP) -o $@ -c $*_os4.cpp
 	
 $(LINUXDOBJ)%.o: %_linux.cpp $(DEPS)
-	@echo "\t[D LIN ] CC $* "
+	@$(ECHO) "\t[D LIN ] CC $* "
 	@$(LINUX_CC) $(LINUX_DCCFLAGS) $(CPPFLAGS) $(PREP) -o $@ -c $*_linux.cpp
 #---
 
 #*** Global targets.
 
 $(AROSROBJ)%.o: %.cpp $(DEPS)
-	@echo "\t[R AROS] CC $* "
+	@$(ECHO) "\t[R AROS] CC $* "
 	@$(AROS_CC) $(AROS_RCCFLAGS) $(CPPFLAGS) $(PREP) -o $@ -c $*.cpp
 
 $(M68KROBJ)%.o: %.cpp $(DEPS)
-	@echo "\t[R M68K] CC $* "
+	@$(ECHO) "\t[R M68K] CC $* "
 	@$(M68K_CC) $(M68K_RCCFLAGS) $(CPPFLAGS) $(PREP) -o $@ -c $*.cpp
 	
 $(MORPHOSROBJ)%.o: %.cpp $(DEPS)
-	@echo "\t[R MOS ] CC $* "
+	@$(ECHO) "\t[R MOS ] CC $* "
 	@$(MORPHOS_CC) $(MORPHOS_RCCFLAGS) $(CPPFLAGS) $(PREP) -o $@ -c $*.cpp
 
 $(OS4ROBJ)%.o: %.cpp $(DEPS)
-	@echo "\t[R OS4 ] CC $* "
+	@$(ECHO) "\t[R OS4 ] CC $* "
 	@$(OS4_CC) $(OS4_RCCFLAGS) $(CPPFLAGS) $(PREP) -o $@ -c $*.cpp
 
 $(LINUXROBJ)%.o: %.cpp $(DEPS)
-	@echo "\t[R LIN ] CC $* "
+	@$(ECHO) "\t[R LIN ] CC $* "
 	@$(LINUX_CC) $(LINUX_RCCFLAGS) $(CPPFLAGS) $(PREP) -o $@ -c $*.cpp
 
 $(AROSDOBJ)%.o: %.cpp $(DEPS)
-	@echo "\t[D AROS] CC $* "
+	@$(ECHO) "\t[D AROS] CC $* "
 	@$(AROS_CC) $(AROS_DCCFLAGS) $(CPPFLAGS) $(PREP) -o $@ -c $*.cpp
 
 $(M68KDOBJ)%.o: %.cpp $(DEPS)
-	@echo "\t[D M68K] CC $* "
+	@$(ECHO) "\t[D M68K] CC $* "
 	@$(M68K_CC) $(M68K_DCCFLAGS) $(CPPFLAGS) $(PREP) -o $@ -c $*.cpp
 	
 $(MORPHOSDOBJ)%.o: %.cpp $(DEPS)
-	@echo "\t[D MOS ] CC $* "
+	@$(ECHO) "\t[D MOS ] CC $* "
 	@$(MORPHOS_CC) $(MORPHOS_DCCFLAGS) $(CPPFLAGS) $(PREP) -o $@ -c $*.cpp
 
 $(OS4DOBJ)%.o: %.cpp $(DEPS)
-	@echo "\t[D OS4 ] CC $* "
+	@$(ECHO) "\t[D OS4 ] CC $* "
 	@$(OS4_CC) $(OS4_DCCFLAGS) $(CPPFLAGS) $(PREP) -o $@ -c $*.cpp
 
 $(LINUXDOBJ)%.o: %.cpp $(DEPS)
-	@echo "\t[D LIN ] CC $* "
+	@$(ECHO) "\t[D LIN ] CC $* "
 	@$(LINUX_CC) $(LINUX_DCCFLAGS) $(CPPFLAGS) $(PREP) -o $@ -c $*.cpp
 
 #---	
@@ -453,43 +455,43 @@ $(LINUXDOBJ)%.o: %.cpp $(DEPS)
 #*** C targets.
 
 $(AROSROBJ)%.o: %.c $(DEPS)
-	@echo "\t[R AROS] CC $* "
+	@$(ECHO) "\t[R AROS] CC $* "
 	@$(AROS_CC) $(AROS_RCCFLAGS) $(PREP) -o $@ -c $*.c
 
 $(M68KROBJ)%.o: %.c $(DEPS)
-	@echo "\t[R M68K] CC $* "
+	@$(ECHO) "\t[R M68K] CC $* "
 	@$(M68K_CC) $(M68K_RCCFLAGS) $(PREP) -o $@ -c $*.c
 	
 $(MORPHOSROBJ)%.o: %.c $(DEPS)
-	@echo "\t[R MOS ] CC $* "
+	@$(ECHO) "\t[R MOS ] CC $* "
 	@$(MORPHOS_CC) $(MORPHOS_RCCFLAGS) $(PREP) -o $@ -c $*.c
 
 $(OS4ROBJ)%.o: %.c $(DEPS)
-	@echo "\t[R OS4 ] CC $* "
+	@$(ECHO) "\t[R OS4 ] CC $* "
 	@$(OS4_CC) $(OS4_RCCFLAGS) $(PREP) -o $@ -c $*.c
 
 $(LINUXROBJ)%.o: %.c $(DEPS)
-	@echo "\t[R LIN ] CC $* "
+	@$(ECHO) "\t[R LIN ] CC $* "
 	@$(LINUX_CC) $(LINUX_RCCFLAGS) $(PREP) -o $@ -c $*.c
 
 $(AROSDOBJ)%.o: %.c $(DEPS)
-	@echo "\t[D AROS] CC $* "
+	@$(ECHO) "\t[D AROS] CC $* "
 	@$(AROS_CC) $(AROS_DCCFLAGS) $(PREP) -o $@ -c $*.c
 
 $(M68KDOBJ)%.o: %.c $(DEPS)
-	@echo "\t[D M68K] CC $* "
+	@$(ECHO) "\t[D M68K] CC $* "
 	@$(M68K_CC) $(M68K_DCCFLAGS) $(PREP) -o $@ -c $*.c
 	
 $(MORPHOSDOBJ)%.o: %.c $(DEPS)
-	@echo "\t[D MOS ] CC $* "
+	@$(ECHO) "\t[D MOS ] CC $* "
 	@$(MORPHOS_CC) $(MORPHOS_DCCFLAGS) $(PREP) -o $@ -c $*.c
 
 $(OS4DOBJ)%.o: %.c $(DEPS)
-	@echo "\t[D OS4 ] CC $* "
+	@$(ECHO) "\t[D OS4 ] CC $* "
 	@$(OS4_CC) $(OS4_DCCFLAGS) $(PREP) -o $@ -c $*.c
 
 $(LINUXDOBJ)%.o: %.c $(DEPS)
-	@echo "\t[D LIN ] CC $* "
+	@$(ECHO) "\t[D LIN ] CC $* "
 	@$(LINUX_CC) $(LINUX_DCCFLAGS) $(PREP) -o $@ -c $*.c
 
 #---

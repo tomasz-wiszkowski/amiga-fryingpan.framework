@@ -1,6 +1,6 @@
 /*
  * Amiga Generic Set - set of libraries and includes to ease sw development for all Amiga platforms
- * Copyright (C) 2001-2011 Tomasz Wiszkowski Tomasz.Wiszkowski at gmail.com.
+ * Copyright (C) 2004-2008 Tomasz Wiszkowski Tomasz.Wiszkowski at gmail.com.
  * 
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -21,7 +21,7 @@
 #include <proto/utility.h>
 
 
-sint DoMethodA(Object* obj, iptr message)
+iptr DoMethodA(Object* obj, iptr *message)
 {
 #ifndef __amigaos4__
    register struct Library *UtilityBase = __InternalUtilityBase;

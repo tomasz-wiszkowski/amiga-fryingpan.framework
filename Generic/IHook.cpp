@@ -1,6 +1,6 @@
 /*
  * Amiga Generic Set - set of libraries and includes to ease sw development for all Amiga platforms
- * Copyright (C) 2001-2011 Tomasz Wiszkowski Tomasz.Wiszkowski at gmail.com.
+ * Copyright (C) 2004-2008 Tomasz Wiszkowski Tomasz.Wiszkowski at gmail.com.
  * 
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -27,12 +27,12 @@
 using namespace GenNS;
 
 #if defined (__AROS__) || defined (__AMIGAOS4__)
-uint32 IHook::subCaller(Hook *pHook, uint32 pObject, uint32 pMessage)
+iptr IHook::subCaller(Hook *pHook, iptr pObject, iptr pMessage)
 {
    return ((IHook*)pHook->h_Data)->Call(pObject, pMessage);
 }
 #elif defined (__MORPHOS__)
-uint32 IHook::subCaller()
+iptr IHook::subCaller()
 {
    Hook*pHook    = (Hook*)REG_A0;
    uint32 pObject  = (uint32)REG_A2;
@@ -40,7 +40,7 @@ uint32 IHook::subCaller()
    return ((IHook*)pHook->h_Data)->Call(pObject, pMessage);
 }
 #elif defined (__mc68000)
-uint32 IHook::subCaller()
+iptr IHook::subCaller()
 {
    Hook    *pHook;
    uint32   pObject;
@@ -62,10 +62,10 @@ void IHook::Initialize()
    hHook.h_Data      =  (void*)(this);
 #ifdef __MORPHOS__
    hMOSCall[0]       =  0xff000000;
-   hMOSCall[1]       =  (unsigned long)&subCaller;
-   hHook.h_Entry     =  (unsigned long(*)())&hMOSCall;
+   hMOSCall[1]       =  (iptr)&subCaller;
+   hHook.h_Entry     =  (iptr(*)())&hMOSCall;
 #else
-   hHook.h_Entry     =  (unsigned long(*)())&subCaller;
+   hHook.h_Entry     =  (iptr(*)())&subCaller;
 #endif
    hHook.h_SubEntry  =  0;
 

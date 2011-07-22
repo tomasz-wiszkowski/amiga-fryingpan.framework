@@ -1,6 +1,6 @@
 /*
  * Amiga Generic Set - set of libraries and includes to ease sw development for all Amiga platforms
- * Copyright (C) 2001-2011 Tomasz Wiszkowski Tomasz.Wiszkowski at gmail.com.
+ * Copyright (C) 2004-2008 Tomasz Wiszkowski Tomasz.Wiszkowski at gmail.com.
  * 
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -25,13 +25,14 @@
 #include "HookT.h"
 #include <exec/libraries.h>
 #include "VectorT.h"
+#include "IIO.h"
 
 class BSDSocketIFace;
 struct sockaddr_in;
 
 namespace GenNS
 {
-   class NetSocket 
+   class NetSocket : public IIO
    {
    public:
       enum SocketType
@@ -68,9 +69,10 @@ namespace GenNS
       int32                      nSignal;
       bool                       bConnected;
       bool                       bServer;
-      unsigned long              lThreadSignal;
+      iptr              lThreadSignal;
       BSDSocketIFace            *bsock;
       int32                      error;
+      iptr			 data_timeout;
       sockaddr_in               *addr_local;
       sockaddr_in               *addr_remote;
 
@@ -94,10 +96,12 @@ namespace GenNS
 
       virtual bool               Connect(char* AHost, int APort, SocketType=Skt_TCP);
       virtual void               Disconnect();
-      virtual int32              ReadBuffer(void* buffer, int32 maxlen);
-      virtual int32              WriteBuffer(void* buffer, int32 maxlen);
+      virtual iptr               ReadData(void* buffer, iptr maxlen);
+      virtual iptr               WriteData(void* buffer, iptr maxlen);
+      virtual bool		 IsOpened();
       virtual bool               Listen(int APort, SocketType=Skt_TCP);
-      virtual int32              GetDataAvail();
+      virtual iptr               GetDataAvail();
+      virtual void		 SetDataAvailTimeout(iptr to);
       virtual bool               Accept(SocketID*);
       virtual void               SetSignals(uint32 signal);
       virtual uint32             GetSignals();

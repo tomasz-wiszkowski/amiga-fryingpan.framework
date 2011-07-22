@@ -1,6 +1,6 @@
 /*
  * Amiga Generic Set - set of libraries and includes to ease sw development for all Amiga platforms
- * Copyright (C) 2001-2011 Tomasz Wiszkowski Tomasz.Wiszkowski at gmail.com.
+ * Copyright (C) 2004-2008 Tomasz Wiszkowski Tomasz.Wiszkowski at gmail.com.
  * 
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -28,7 +28,7 @@
 using namespace GenNS;
 
 #if defined(mc68000)
-   static unsigned long ___vFormatFunc[] = 
+   static iptr ___vFormatFunc[] = 
       { 0x16c04e75, 0x4e754e75 };
 #endif
 
@@ -46,7 +46,7 @@ void String::Update()
    lLength = strlen((const char*)sContents);
 }
 
-void String::SetLength(unsigned long lLen)
+void String::SetLength(iptr lLen)
 {
    if (lLen >= lMaxLen)
       ReallocBuf(lLen + 1);
@@ -177,7 +177,7 @@ int String::operator == (const char* sStr)  const
    return 0 == strncmp(Data(), sStr, Length());          // compare only what we are aware of.
 }
 
-int String::FormatStr(char *sFmtStr, void*pParams)
+int String::FormatStr(const char *sFmtStr, void*pParams)
 {
    char *temp = new char[65535];
    ASSERT(Exec != 0);
@@ -301,7 +301,7 @@ String &String::operator += (const char cChar)
    return *this;
 }
 
-unsigned long String::TrimChars(char* sChars)
+iptr String::TrimChars(char* sChars)
 {
    int lNewStart = 0;
    int lNewEnd   = Length();
@@ -343,7 +343,14 @@ char &String::operator [] (int lOffset)
    return (char&)sContents[lOffset];
 }
 
-String String::SubString(int lFirst, int lLen)
+const char String::operator [] (int lOffset) const
+{
+   ASSERT(lOffset >= 0);
+   ASSERT(lOffset <= (int)lMaxLen);
+   return sContents[lOffset];
+}
+
+String String::SubString(int lFirst, int lLen) const
 {
    String   s;
    int      pos;
@@ -365,22 +372,22 @@ String String::SubString(int lFirst, int lLen)
    return s;
 }
 
-String String::LeftString(int lLen)
+String String::LeftString(int lLen) const
 {
    return SubString(0, lLen);
 }
 
-String String::RightString(int lLen)
+String String::RightString(int lLen) const
 {
    return SubString (Length()-lLen, lLen);
 }
 
-bool String::Equals(const char* sOther)
+bool String::Equals(const char* sOther) const
 {
    return (0 == strcmp((char*)sContents, sOther));
 }
 
-bool String::EqualsIgnoreCase(const char* sOther)
+bool String::EqualsIgnoreCase(const char* sOther) const
 {
    return (0 == stricmp((char*)sContents, sOther));
 }
@@ -422,6 +429,7 @@ int32 String::ToLong()
             lType = E_Bin;
          else
             lType = E_Oct;
+	 continue;
       }
       
       switch (lType)
@@ -450,9 +458,9 @@ int32 String::ToLong()
                 ((c < 'A') || (c > 'F')))
                return lValue;
 
-            if (c < '9')
+            if (c <= '9')
                c -= '0';
-            else if (c < 'F')
+            else if (c <= 'F')
                c -= ('A'-10);
             else 
                c -= ('a'-10);
@@ -683,7 +691,7 @@ void String::strcat(char* pDst, const char* pSrc)
    strcpy(pDst, pSrc);
 }
 
-void String::strncat(char* pDst, const char* pSrc, long lLen)
+void String::strncat(char* pDst, const char* pSrc, iptr lLen)
 {
    if (0 == pDst)                                     // no stirng?
       return;                                         // abort
@@ -697,7 +705,7 @@ void String::strncat(char* pDst, const char* pSrc, long lLen)
    strncpy(pDst, pSrc, lLen);                         // copy the remaining bytes.
 }
 */
-VectorT<String> String::Explode()
+VectorT<String> String::Explode() const
 {
    VectorT<String> vec;
    register int    s;
@@ -794,4 +802,37 @@ String GenNS::operator + (const char *sStr1, const String sStr2)
    sub += sStr2.Data();
    return sub;
 }
+
+/*
+#error does not work
+VectorT<String> String::Explode(const char sep[]) const
+{
+    VectorT<String> vec;
+    register int    s=0;
+    register int    e=0;
+    register int    i;
+
+    vec.Empty();
+
+    for (; e<Length(); e++)
+    {
+	register unsigned char c = sContents[e];
+
+
+	for (i = 0; sep[i] != 0; i++)
+	    if (c == sep[i])
+		break;
+
+	if (sep[i] == 0)
+	    continue;
+
+	request("", "start %ld, end %ld, sub %s", "ok", ARRAY(s, e, (iptr)SubString(s, e-s).Data()));
+	vec << SubString(s, e-s);
+	e++;
+	s=e;
+    }
+
+    return vec; 
+}
+*/
 

@@ -1,22 +1,3 @@
-/*
- * Amiga Generic Set - set of libraries and includes to ease sw development for all Amiga platforms
- * Copyright (C) 2001-2011 Tomasz Wiszkowski Tomasz.Wiszkowski at gmail.com.
- * 
- * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU Lesser General Public
- * License as published by the Free Software Foundation; either
- * version 2.1 of the License, or (at your option) any later version.
- * 
- * This library is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Lesser General Public License for more details.
- * 
- * You should have received a copy of the GNU Lesser General Public
- * License along with this library; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
- */
-
 #ifndef LIB_C_H_
 #define LIB_C_H_
 
@@ -27,7 +8,7 @@
 #include <intuition/classusr.h>                      
 #include <intuition/classes.h>
 #include <exec/semaphores.h>
-#include <Generic/Types.h>
+#include "types.h"
 
 extern struct SignalSemaphore __InternalSemaphore;
 extern void*                  __InternalMemPool;
@@ -77,7 +58,7 @@ extern "C"
    extern void    __cleanup();                     // cleanup proc, call it from your lib expunge. REQUIRES VALID EXECBASE
    extern int     main();
 
-   extern void    _error(const char*, iptr);
+   extern void    _error(const char*, iptr*);
 
    /* regular c code */
    extern void*   malloc(size_t size);
@@ -120,10 +101,10 @@ extern "C"
    extern int64   __divdi3(int64, int64);
    extern int64   __moddi3(int64, int64);
 
-   sint          DoMethodA(Object* obj, iptr message);
-   sint          DoSuperMethodA(Class* cl, Object* obj, iptr message);
+   iptr          DoMethodA(Object* obj, iptr *message);
+   iptr          DoSuperMethodA(Class* cl, Object* obj, iptr *message);
 
-   int32          request(const char* title, const char* body, const char* gads, const iptr params);
+   int32          request(const char* title, const char* body, const char* gads, const iptr* params);
 
    const struct Allocator* SLAB_Init(uint8 last_shift, const uint32 config_array[]);
    void  SLAB_Cleanup(const struct Allocator*);
@@ -153,7 +134,7 @@ extern "C"
          if (0 == request("ASSERTION FAILED!", "Assertion failed. "     \
                                       "Please report.\nCondition:\n" #expr          \
                                       "\nOccurence:\n%s\n" __FILE__ ", line %ld\n",     \
-                                      "Continue|Abort", ARRAY((int)(__PRETTY_FUNCTION__), __LINE__)))           \
+                                      "Continue|Abort", ARRAY((iptr)(__FUNCTION__), __LINE__)))           \
             abort();      \
       }        
 
@@ -162,14 +143,33 @@ extern "C"
       {                          \
          if (0 == request("ASSERTION FAILED!", "Assertion failed. "                \
                                       "Please report.\nCondition:\n" #expr                            \
-                                      "\nOccurence:\n" __FILE__ ", line %ld\n"                        \
-                                      "Message:\n%s" , "Continue|Abort", ARRAY(__LINE__, (int)msg)))  \
+                                      "\nOccurence:\n%s\n" __FILE__ ", line %ld\n"                        \
+                                      "Message:\n%s" , "Continue|Abort", ARRAY((iptr)__FUNCTION__, __LINE__, (iptr)msg)))  \
             abort();             \
       }        
+
+    #define FAIL(expr, msg, more...) \
+	if ((expr) && (0 == request("Unexpected condition", "%s, %ld\n%s\n\n" msg, "OK", ARRAY((iptr)__FILE__, __LINE__, (iptr)#expr, more))))
+
+    #define WARN(expr, msg, more...) \
+	if ((expr) && (0 == request("Unexpected condition", "%s, %ld\n%s\n\n" msg, "OK|Abort", ARRAY((iptr)__FILE__, __LINE__, (iptr)#expr, more))))
+
+    #define CKPT(msg, more...) \
+	request("Checkpoint", "%s, %ld\n\n" msg, "OK", ARRAY((iptr)__FILE__, __LINE__, more))
+
 #else
    #define ASSERT(expr)
    #define ASSERTS(expr, msg)
-#endif
 
+    #define FAIL(expr, msg, more...) \
+	if ((expr) && (0 == request("Unexpected condition", msg, "OK", ARRAY(more))))
+
+    #define WARN(expr, msg, more...) \
+	if ((expr) && (0 == request("Unexpected condition", msg, "OK|Abort", ARRAY(more))))
+
+    #define CKPT(msg, more...) \
+	request("Checkpoint", msg, "OK", ARRAY(more))
+
+#endif
 
 #endif /*FUNCTIONS_H_*/

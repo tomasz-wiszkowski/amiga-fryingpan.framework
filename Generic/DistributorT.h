@@ -1,6 +1,6 @@
 /*
  * Amiga Generic Set - set of libraries and includes to ease sw development for all Amiga platforms
- * Copyright (C) 2001-2011 Tomasz Wiszkowski Tomasz.Wiszkowski at gmail.com.
+ * Copyright (C) 2004-2008 Tomasz Wiszkowski Tomasz.Wiszkowski at gmail.com.
  * 
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -52,7 +52,7 @@ namespace GenNS
 
       virtual void Send(Param1 pArg1, Param2 pArg2)
       {
-         for (int i=0; i<hTargets.Count(); i++)
+         for (uint32 i=0; i<hTargets.Count(); i++)
          {
             HookAttrT<Param1, Param2>::Call(hTargets[i], pArg1, pArg2);
          }

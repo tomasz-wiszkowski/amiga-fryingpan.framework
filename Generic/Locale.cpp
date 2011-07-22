@@ -1,324 +1,384 @@
-/*
- * Amiga Generic Set - set of libraries and includes to ease sw development for all Amiga platforms
- * Copyright (C) 2001-2011 Tomasz Wiszkowski Tomasz.Wiszkowski at gmail.com.
- * 
- * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU Lesser General Public
- * License as published by the Free Software Foundation; either
- * version 2.1 of the License, or (at your option) any later version.
- * 
- * This library is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Lesser General Public License for more details.
- * 
- * You should have received a copy of the GNU Lesser General Public
- * License along with this library; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
- */
-
 #include "Locale.h"
 #include <libclass/locale.h>
 #include "Types.h"
+#include "String.h"
 #include <libraries/locale.h>
 #include <libclass/dos.h>
 #include <dos/dos.h>
 
+using namespace GenNS;
 
-
-GenNS::Localization::Localization(Localization::LocaleSet set[], const char* grp) :
-   deflt("*** Undefined ***", "NO_GROUP", "NO_ID"),
-   hash(deflt)
+DummyLocalization::DummyLocalization(ILocalization::LocaleSet set[], const char* grp) :
+    deflt("*** Undefined ***", "NO_GROUP", "NO_ID"),
+    hash(&deflt)
 {
-   locale = LocaleIFace::GetInstance(0);
-   lang = 0;
-
-   if (locale != 0)
-      lang = locale->OpenLocale(0);
-
-   if (set != 0)
-      Add(set, grp);
+    if (set != 0)
+	AddGroup(set, grp);
 }
 
-GenNS::Localization::~Localization()
+DummyLocalization::~DummyLocalization()
 {
-   if (lang != 0)
-      locale->CloseLocale(lang);
-
-   locale->FreeInstance();
+    for (uint32 i=0; i<hash.Count(); i++)
+    {
+	delete hash.GetValAt(i);
+    }
 }
 
-void GenNS::Localization::Add(GenNS::Localization::LocaleSet set[], const char* grp)
+void DummyLocalization::AddItem(uint32 key, const char* text, const char* id, const char* group)
 {
-   int i = 0;
-   if (set == 0)
-      return;
-
-   locale_set ls("", grp, 0);
-
-   while (set[i].key != (uint32)GenNS::Localization::LocaleSet::Set_Last)
-   {
-      ls.id  = set[i].locale_id;
-      split(set[i].value, ls.accel[0], ls.str);
-      //request("Info", "%s = %s + %s", "Ok", ARRAY((uint)set[i].value, (uint)&ls.accel, (uint)ls.str.Data()));
-      hash.Add(set[i].key, ls);
-      ++i;
-   }
+    locale_set *ls = new locale_set("", group, id);
+    ls->id  = id;
+    split(text, ls->accel[0], ls->str);
+    hash.Add(key, ls);
 }
 
-const GenNS::String& GenNS::Localization::operator[] (uint val)
+void DummyLocalization::AddGroup(ILocalization::LocaleSet set[], const char* grp)
 {
-   return hash.GetVal(val).str;
+    int i = 0;
+    if (set == 0)
+	return;
+
+    while (set[i].key != (uint32)ILocalization::LocaleSet::Set_Last)
+    {
+	AddItem(set[i].key, set[i].value, set[i].locale_id, grp);
+	++i;
+    }
 }
 
-bool GenNS::Localization::ReadCatalog(const char* name, sint version)
+const String& DummyLocalization::operator[] (uint32 val) const
 {
-   LocaleIFace *locale = LocaleIFace::GetInstance(0);
-   bool res = false;
-
-   if (locale != 0)
-   {
-      Catalog *cat = locale->OpenCatalogA(0, name, TAGARRAY(OC_Version, version, TAG_DONE, 0));
-      if (cat != 0)
-      {
-         res = true;
-         for (int i=0; i<hash.Count(); i++)
-         {
-            uint32 k = hash.GetKey(i);
-            const char *t = locale->GetCatalogStr(cat, k, 0);
-            if (t == 0)
-               continue;
-            locale_set &set = const_cast<locale_set&>(hash.GetVal(k));
-            split(t, set.accel[0], set.str);
-         }
-         locale->CloseCatalog(cat);
-      }      
-      locale->FreeInstance();
-   }
-
-   return res;
-}
-      
-const GenNS::String& GenNS::Localization::Str(uint key)
-{
-   return (*this)[key];
+    return hash.GetVal(val)->str;
 }
 
-bool GenNS::Localization::ExportCD(const char* filename, sint version)
+const String& DummyLocalization::Str(uint32 key) const
 {
-   ASSERT(DOS != 0);
-   if (DOS == 0)
-      return false;
-
-   BPTR fh = DOS->Open(filename, MODE_NEWFILE);
-
-   if (fh != 0)
-   {
-      String s;
-      DOS->VFPrintf(fh, ";#version %ld\n", ARRAY(version));
-      DOS->VFPrintf(fh, ";#language english\n", 0);
-      DOS->VFPrintf(fh, ";\n", 0);
-      for (int i=0; i<hash.Count(); i++)
-      {
-         uint32 key = hash.GetKey(i);
-         const char* g;
-         const locale_set &set = hash.GetVal(key);
-         
-         if (set.group == 0)
-            g = "GLOBAL";
-         else
-            g = set.group;
-
-         if (set.id == 0)
-            s.FormatStr("%s_%ld", ARRAY((uint)g, key));
-         else
-            s.FormatStr("%s_%s", ARRAY((uint)g, (uint)set.id));
-
-         DOS->VFPrintf(fh, "%s (%ld//)\n", ARRAY((uint)s.Data(), key));
-         s = set.str;
-         s.Substitute("\n", "\\n");
-         s.Substitute("\033", "\\033");
-         if (set.accel[0] == 0)
-            DOS->VFPrintf(fh, "%s\n", ARRAY((uint)s.Data()));
-         else
-            DOS->VFPrintf(fh, "%lc&%s\n", ARRAY((uint)set.accel[0], (uint)s.Data()));
-         DOS->VFPrintf(fh, ";\n", 0);
-      }
-
-      DOS->Close(fh);
-      return true;
-   }
-   return false;
+    return (*this)[key];
 }
 
-bool GenNS::Localization::ExportCT(const char* filename, sint version)
+void DummyLocalization::split(String s, char &accelerator, String &text)
 {
-   ASSERT(DOS != 0);
-   if (DOS == 0)
-      return false;
-
-   BPTR fh = DOS->Open(filename, MODE_NEWFILE);
-
-   if (fh != 0)
-   {
-      String s;
-      DOS->VFPrintf(fh, "##version %s %ld.0\n", ARRAY((uint)filename, version));
-      DOS->VFPrintf(fh, "##language english\n", 0);
-      DOS->VFPrintf(fh, ";\n", 0);
-      for (int i=0; i<hash.Count(); i++)
-      {
-         uint32 key = hash.GetKey(i);
-         const char* g;
-         const locale_set &set = hash.GetVal(key);
-         
-         if (set.group == 0)
-            g = "GLOBAL";
-         else
-            g = set.group;
-
-         if (set.id == 0)
-            s.FormatStr("%s_%ld", ARRAY((uint)g, key));
-         else
-            s.FormatStr("%s_%s", ARRAY((uint)g, (uint)set.id));
-
-         DOS->VFPrintf(fh, "%s\n", ARRAY((uint)s.Data()));
-         s = set.str;
-         s.Substitute("\n", "\\n");
-         s.Substitute("\033", "\\033");
-         if (set.accel[0] == 0)
-            DOS->VFPrintf(fh, "%s\n", ARRAY((uint)s.Data()));
-         else
-            DOS->VFPrintf(fh, "%lc&%s\n", ARRAY((uint)set.accel[0], (uint)s.Data()));
-         DOS->VFPrintf(fh, ";\n", 0);
-      }
-
-      DOS->Close(fh);
-      return true;
-   }
-   return false;
-}
-      
-void GenNS::Localization::split(GenNS::String s, char &accelerator, GenNS::String &text)
-{
-   if (s[1] == '&')
-   {
-      accelerator = s[0];
-      text = s.SubString(2, -1);
-   }
-   else
-   {
-      accelerator = '\0';
-      text = s;
-   }
+    if (s[1] == '&')
+    {
+	accelerator = s[0];
+	text = s.SubString(2, -1);
+    }
+    else
+    {
+	accelerator = '\0';
+	text = s;
+    }
 }
 
-const char GenNS::Localization::Accel(uint key)
+const char DummyLocalization::Accel(uint32 key) const
 {
-   //request("Info", "accelerator: %s", "Ok", ARRAY((uint)hash.GetVal(key).accel[0]));
-   return hash.GetVal(key).accel[0];
+    return hash.GetVal(key)->accel[0];
 }
 
-const char* GenNS::Localization::Shortcut(uint key)
+const char* DummyLocalization::Shortcut(uint32 key) const
 {
-   //request("Info", "shortcut: %s", "Ok", ARRAY((uint)&hash.GetVal(key).accel));
-   return (const char*)(&hash.GetVal(key).accel);
+    return (const char*)(&hash.GetVal(key)->accel);
 }
-      
-GenNS::String GenNS::Localization::FormatNumber(int32 integer, int32 millionth)
+
+String DummyLocalization::FormatNumber(uint32 integer, uint32 millionth) const
 {
-   char temp[32];
-  
-   uint8 grp[] = { 3, 0 }; 
-   const char* decp = lang ? lang->loc_DecimalPoint : ".";
-   const char* gsep = lang ? lang->loc_GroupSeparator : " ";
-   const char* fsep = lang ? lang->loc_FracGroupSeparator : " ";
-   const uint8* ggrp = lang ? lang->loc_Grouping : (uint8*)&grp;
-   const uint8* fgrp = lang ? lang->loc_FracGrouping : (uint8*)&grp;
-   int gpos = 0;
-   int part = 0;
-   bool sign = false;
-   uint pos = sizeof(temp);
+    String s;
+    if (millionth != 0)
+	s.FormatStr("%ld.%06ld", ARRAY(integer, millionth));
+    else
+	s.FormatStr("%ld", ARRAY(integer));
+    return s;
+}
 
-   if (integer < 0)
-   {
-      sign = true;
-      integer = -integer;
-   }
+/******************************************************************************/
+Localization::Localization(ILocalization::LocaleSet set[], const char* grp) :
+    DummyLocalization(set, grp)
+{
+    locale = LocaleIFace::GetInstance(0);
+    lang = 0;
 
-   do 
-   {
-      --pos;
-      /* 
-       * handle group
-       */
-      if (gpos == *ggrp)
-      {
-         gpos = 0;
-         ggrp++;
-         if (!*ggrp)
-            ggrp--;
-         if (*gsep)
-            temp[pos--] = *gsep;
-      }
-      gpos++;
+    if (locale != 0)
+	lang = locale->OpenLocale(0);
+}
 
-      part = integer % 10;
-      integer /= 10;
-      temp[pos] = part + '0';
-   } 
-   while (integer != 0);
+Localization::~Localization()
+{
+    if (lang != 0)
+	locale->CloseLocale(lang);
 
-   if (sign)
-      temp[--pos] = '-';
+    locale->FreeInstance();
+}
 
-   /*
+bool Localization::ReadCatalog(const char* name, uint32 version)
+{
+    LocaleIFace *locale = LocaleIFace::GetInstance(0);
+    bool res = false;
+
+    if (locale != 0)
+    {
+	Catalog *cat = locale->OpenCatalogA(0, name, TAGARRAY(OC_Version, version, TAG_DONE, 0));
+	if (cat != 0)
+	{
+	    res = true;
+	    for (uint32 i=0; i<hash.Count(); i++)
+	    {
+		uint32 k = hash.GetKeyAt(i);
+		const char *t = locale->GetCatalogStr(cat, k, 0);
+		if (t == 0)
+		    continue;
+		locale_set *set = const_cast<locale_set*>(hash.GetVal(k));
+		split(t, set->accel[0], set->str);
+	    }
+	    locale->CloseCatalog(cat);
+	}      
+	locale->FreeInstance();
+    }
+
+    return res;
+}
+
+bool Localization::ExportCD(const char* filename, uint32 version) const
+{
+    ASSERT(DOS != 0);
+    if (DOS == 0)
+	return false;
+
+    BPTR fh = DOS->Open(filename, MODE_NEWFILE);
+
+    if (fh != 0)
+    {
+	String s;
+	DOS->VFPrintf(fh, ";#version %ld\n", ARRAY(version));
+	DOS->VFPrintf(fh, ";#language english\n", 0);
+	DOS->VFPrintf(fh, ";\n", 0);
+	for (uint32 i=0; i<hash.Count(); i++)
+	{
+	    uint32 key = hash.GetKeyAt(i);
+	    const char* g;
+	    const locale_set *set = hash.GetVal(key);
+
+	    if (set->group == 0)
+		g = "GLOBAL";
+	    else
+		g = set->group;
+
+	    if (set->id == 0)
+		s.FormatStr("%s_%ld", ARRAY((uint32)g, key));
+	    else
+		s.FormatStr("%s_%s", ARRAY((uint32)g, (uint32)set->id));
+
+	    DOS->VFPrintf(fh, "%s (%ld//)\n", ARRAY((uint32)s.Data(), key));
+	    s = set->str;
+	    s.Substitute("\n", "\\n");
+	    s.Substitute("\033", "\\033");
+	    if (set->accel[0] == 0)
+		DOS->VFPrintf(fh, "%s\n", ARRAY((uint32)s.Data()));
+	    else
+		DOS->VFPrintf(fh, "%lc&%s\n", ARRAY((uint32)set->accel[0], (uint32)s.Data()));
+	    DOS->VFPrintf(fh, ";\n", 0);
+	}
+
+	DOS->Close(fh);
+	return true;
+    }
+    return false;
+}
+
+bool Localization::ExportCT(const char* filename, uint32 version) const
+{
+    ASSERT(DOS != 0);
+    if (DOS == 0)
+	return false;
+
+    BPTR fh = DOS->Open(filename, MODE_NEWFILE);
+
+    if (fh != 0)
+    {
+	String s;
+	DOS->VFPrintf(fh, "##version %s %ld.0\n", ARRAY((uint32)filename, version));
+	DOS->VFPrintf(fh, "##language english\n", 0);
+	DOS->VFPrintf(fh, ";\n", 0);
+	for (uint32 i=0; i<hash.Count(); i++)
+	{
+	    uint32 key = hash.GetKeyAt(i);
+	    const char* g;
+	    const locale_set *set = hash.GetVal(key);
+
+	    if (set->group == 0)
+		g = "GLOBAL";
+	    else
+		g = set->group;
+
+	    if (set->id == 0)
+		s.FormatStr("%s_%ld", ARRAY((uint32)g, key));
+	    else
+		s.FormatStr("%s_%s", ARRAY((uint32)g, (uint32)set->id));
+
+	    DOS->VFPrintf(fh, "%s\n", ARRAY((uint32)s.Data()));
+	    s = set->str;
+	    s.Substitute("\n", "\\n");
+	    s.Substitute("\033", "\\033");
+	    if (set->accel[0] == 0)
+		DOS->VFPrintf(fh, "%s\n", ARRAY((uint32)s.Data()));
+	    else
+		DOS->VFPrintf(fh, "%lc&%s\n", ARRAY((uint32)set->accel[0], (uint32)s.Data()));
+	    DOS->VFPrintf(fh, ";\n", 0);
+	}
+
+	DOS->Close(fh);
+	return true;
+    }
+    return false;
+}
+
+String Localization::FormatNumber(uint32 integer, uint32 millionth) const
+{
+    char temp[32];
+
+    uint8 grp[] = { 3, 0 }; 
+    const char* decp = lang ? lang->loc_DecimalPoint : ".";
+    const char* gsep = lang ? lang->loc_GroupSeparator : " ";
+    const char* fsep = lang ? lang->loc_FracGroupSeparator : " ";
+    const uint8* ggrp = lang ? lang->loc_Grouping : (uint8*)&grp;
+    const uint8* fgrp = lang ? lang->loc_FracGrouping : (uint8*)&grp;
+    int gpos = 0;
+    int part = 0;
+    bool sign = false;
+    uint32 pos = sizeof(temp);
+
+    if (integer < 0)
+    {
+	sign = true;
+	integer = -integer;
+    }
+
+    do 
+    {
+	--pos;
+	/* 
+	* handle group
+	*/
+	if (gpos == *ggrp)
+	{
+	    gpos = 0;
+	    ggrp++;
+	    if (!*ggrp)
+		ggrp--;
+	    if (*gsep)
+		temp[pos--] = *gsep;
+	}
+	gpos++;
+
+	part = integer % 10;
+	integer /= 10;
+	temp[pos] = part + '0';
+    } 
+    while (integer != 0);
+
+    if (sign)
+	temp[--pos] = '-';
+
+    /*
     * ok we have integer part parsed now
     */
-   for (integer=0; pos<sizeof(temp); integer++, pos++)
-      temp[integer] = temp[pos];
-   pos = integer;
+    for (integer=0; pos<sizeof(temp); integer++, pos++)
+	temp[integer] = temp[pos];
+    pos = integer;
 
-   /*
+    /*
     * reverse digit order ;]
     * make life a little easier, too
     */
-   integer = 0;
-   for (int i=0; i<6; i++)
-   {
-      part = millionth % 10;
-      integer <<= 4;
-      integer |= part;
-      millionth /= 10;
-   }
+    integer = 0;
+    for (int i=0; i<6; i++)
+    {
+	part = millionth % 10;
+	integer <<= 4;
+	integer |= part;
+	millionth /= 10;
+    }
 
-   if (0 != integer)
-   {
-      temp[pos++] = *decp;
-      gpos = 0;
+    if (0 != integer)
+    {
+	temp[pos++] = *decp;
+	gpos = 0;
 
-      while (integer != 0)
-      {
-         if (gpos == *fgrp)
-         {
-            gpos = 0;
-            fgrp++;
-            if (!*fgrp)
-               fgrp--;
-            if (*fsep)                 // handle broken locales somehow
-               temp[pos++] = *fsep;
-         }
-         gpos++;
+	while (integer != 0)
+	{
+	    if (gpos == *fgrp)
+	    {
+		gpos = 0;
+		fgrp++;
+		if (!*fgrp)
+		    fgrp--;
+		if (*fsep)                 // handle broken locales somehow
+		    temp[pos++] = *fsep;
+	    }
+	    gpos++;
 
-         part = integer & 0xf;
-         integer >>= 4;
-         temp[pos++] = part + '0';
-      }
+	    part = integer & 0xf;
+	    integer >>= 4;
+	    temp[pos++] = part + '0';
+	}
 
 
-   }
+    }
 
-   temp[pos++] = 0;
+    temp[pos++] = 0;
 
-   return String(temp);
+    return String(temp);
 }
 
+
+/******************************************************************************/
+SubLocalization::SubLocalization(ILocalization& p, ILocalization::IndexOffset o) :
+    parent(p),
+    base(o)
+{
+}
+
+SubLocalization::~SubLocalization()
+{
+}
+
+const String& SubLocalization::operator[](uint32 key) const
+{
+    return parent.operator[](key + base);
+}
+
+const String& SubLocalization::Str(uint32 key) const
+{
+    return parent.Str(key + base);
+}
+
+const char SubLocalization::Accel(uint32 key) const
+{
+    return parent.Accel(key + base);
+}
+
+const char* SubLocalization::Shortcut(uint32 key) const
+{
+    return parent.Shortcut(key + base);
+}
+
+void SubLocalization::AddGroup(ILocalization::LocaleSet set[], const char* grp)
+{
+    int i = 0;
+    if (set == 0)
+	return;
+
+    while (set[i].key != (uint32)ILocalization::LocaleSet::Set_Last)
+    {
+	AddItem(set[i].key, set[i].value, set[i].locale_id, grp);
+	++i;
+    }
+}
+
+void SubLocalization::AddItem(uint32 key, const char* text, const char* id, const char* group)
+{
+    parent.AddItem(base + key, text, id, group);
+}
+
+String SubLocalization::FormatNumber(uint32 i, uint32 f) const
+{
+    return parent.FormatNumber(i, f);
+}

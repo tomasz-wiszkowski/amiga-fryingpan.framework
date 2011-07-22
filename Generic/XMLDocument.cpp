@@ -1,6 +1,6 @@
 /*
  * Amiga Generic Set - set of libraries and includes to ease sw development for all Amiga platforms
- * Copyright (C) 2001-2011 Tomasz Wiszkowski Tomasz.Wiszkowski at gmail.com.
+ * Copyright (C) 2004-2008 Tomasz Wiszkowski Tomasz.Wiszkowski at gmail.com.
  * 
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -184,7 +184,7 @@ void XMLElement::RemAttribute(XMLAttribute* pAttr)
 
 XMLElement *XMLElement::FindChild(const char* sName)
 {
-   for (int i=0; i<hChildren.Count(); i++)
+   for (uint32 i=0; i<hChildren.Count(); i++)
    {
       if (hChildren[i]->GetName().Equals(sName))
          return hChildren[i];
@@ -194,7 +194,7 @@ XMLElement *XMLElement::FindChild(const char* sName)
 
 XMLAttribute *XMLElement::FindAttribute(const char* sName)
 {
-   for (int i=0; i<hAttributes.Count(); i++)
+   for (uint32 i=0; i<hAttributes.Count(); i++)
    {
       if (hAttributes[i]->GetName().Equals(sName))
          return hAttributes[i];

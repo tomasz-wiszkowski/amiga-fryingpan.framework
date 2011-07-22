@@ -1,6 +1,6 @@
 /*
  * Amiga Generic Set - set of libraries and includes to ease sw development for all Amiga platforms
- * Copyright (C) 2001-2011 Tomasz Wiszkowski Tomasz.Wiszkowski at gmail.com.
+ * Copyright (C) 2004-2008 Tomasz Wiszkowski Tomasz.Wiszkowski at gmail.com.
  * 
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -42,13 +42,13 @@ extern class UtilityIFace *Utility;
 #ifdef __AMIGAOS4__
       FUNC1(struct TagItem*,        AllocateTagItems,       5, uint32,              numTags, d0);
       PROC2(                        ApplyTagChanges,        6, struct TagItem*,     list,    a0,   const struct TagItem*,  changes, a1);
-      FUNC1(struct TagItem*,        CloneTagItems,          7, struct TagItem*,     list,    a0);
+      FUNC1(struct TagItem*,        CloneTagItems,          7, const  TagItem*,     list,    a0);
       PROC3(                        FilterTagChanges,       8, struct TagItem*,     changes, a0,   struct TagItem*,        orig,    a1, uint32,                apply,   d0);
       FUNC3(uint32,                 FilterTagItems,         9, struct TagItem*,     list,    a0,   Tag*,                   farray,  a1, uint32,                logic,   d0);
       FUNC2(struct TagItem*,        FindTagItem,           10, Tag,                 value,   d0,   const struct TagItem*,  list,    a0);
-      PROC1(                        FreeTagItems,          11, struct TagItem*,     list,    a0);
+      PROC1(                        FreeTagItems,          11, const  TagItem*,     list,    a0);
       FUNC3(uint32,                 GetTagData,            12, Tag,                 value,   d0,   uint32,                 deflt,   d1, const struct TagItem*, list,    a0);
-      PROC3(                        MapTags,               13, struct TagItem*,     list,    a0,   struct TagItem*,        maplist, a1, uint32,                maptype, d0);
+      PROC3(                        MapTags,               13, struct TagItem*,     list,    a0,   const  TagItem*,        maplist, a1, uint32,                maptype, d0);
       FUNC1(struct TagItem*,        NextTagItem,           14, struct TagItem**,    tags,    a0);
       FUNC3(uint32,                 PackBoolTags,          15, uint32,              initflg, d0,   struct TagItem*,        list,    a0, const struct TagItem*, boolmap, a1);
       PROC2(                        RefreshTagItemClones,  16, struct TagItem*,     clone,   a0,   struct TagItem*,        orig,    a1);
@@ -104,10 +104,10 @@ extern class UtilityIFace *Utility;
       FUNC3(uint32,                 PackBoolTags,           7, uint32,              initflg, d0,   struct TagItem*,        list,    a0, const struct TagItem*, boolmap, a1);
       FUNC1(struct TagItem*,        NextTagItem,            8, struct TagItem**,    tags,    a0);
       PROC3(                        FilterTagChanges,       9, struct TagItem*,     changes, a0,   struct TagItem*,        orig,    a1, uint32,                apply,   d0);
-      PROC3(                        MapTags,               10, struct TagItem*,     list,    a0,   struct TagItem*,        maplist, a1, uint32,                maptype, d0);
+      PROC3(                        MapTags,               10, struct TagItem*,     list,    a0,   const  TagItem*,        maplist, a1, uint32,                maptype, d0);
       FUNC1(struct TagItem*,        AllocateTagItems,      11, uint32,              numTags, d0);
-      FUNC1(struct TagItem*,        CloneTagItems,         12, struct TagItem*,     list,    a0);
-      PROC1(                        FreeTagItems,          13, struct TagItem*,     list,    a0);
+      FUNC1(struct TagItem*,        CloneTagItems,         12, const  TagItem*,     list,    a0);
+      PROC1(                        FreeTagItems,          13, const  TagItem*,     list,    a0);
       PROC2(                        RefreshTagItemClones,  14, struct TagItem*,     clone,   a0,   struct TagItem*,        orig,    a1);
       FUNC2(bool,                   TagInArray,            15, Tag,                 value,   d0,   const Tag*,             array,   a0);
       FUNC3(uint32,                 FilterTagItems,        16, struct TagItem*,     list,    a0,   Tag*,                   farray,  a1, uint32,                logic,   d0);

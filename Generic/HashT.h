@@ -1,6 +1,6 @@
 /*
  * Amiga Generic Set - set of libraries and includes to ease sw development for all Amiga platforms
- * Copyright (C) 2001-2011 Tomasz Wiszkowski Tomasz.Wiszkowski at gmail.com.
+ * Copyright (C) 2004-2008 Tomasz Wiszkowski Tomasz.Wiszkowski at gmail.com.
  * 
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -26,115 +26,131 @@
 
 namespace GenNS
 {
-   template <typename T, typename U, long minSize=16>
-      class HashT 
-   {
-   protected:
-      class HashItem
-      {
-         T  key;
-         U  value;
-      public:
-         HashItem()
-         {
-         }
+    template <typename T, typename U, iptr minSize=16>
+	class HashT 
+	{
+	protected:
+	    class HashItem
+	    {
+		T  key;
+		U  value;
+	    public:
+		HashItem()
+		{
+		}
 
-         HashItem(T k, U v): 
-            key(k), 
-            value(v)
-         {
-         }
+		HashItem(T k, U v): 
+		    key(k), 
+		    value(v)
+		{
+		}
 
-         operator const T&() const
-         {
-            return key;
-         }
+		operator const T&() const
+		{
+		    return key;
+		}
 
-         const T& Key() const
-         {
-            return (const T&)(*this);
-         }
+		const T& Key() const
+		{
+		    return (const T&)(*this);
+		}
 
-         operator const U&() const
-         {
-            return value;
-         }
+		operator const U&() const
+		{
+		    return value;
+		}
 
-         const U& Value() const
-         {
-            return (const U&)(*this);
-         }
+		const U& Value() const
+		{
+		    return (const U&)(*this);
+		}
 
-         void SetValue(U& val)
-         {
-            value = val;
-         }
+		void SetValue(U& val)
+		{
+		    value = val;
+		}
 
-         int operator <(const HashItem& o) const
-         {
-            return key < o.key;
-         }
+		int operator <(const HashItem& o) const
+		{
+		    return key < o.key;
+		}
 
-         int operator == (const HashItem& o) const
-         {
-            return key == o.key;
-         }
+		int operator == (const HashItem& o) const
+		{
+		    return key == o.key;
+		}
 
-         HashItem& operator =(const HashItem& o)
-         {
-            key = o.key;
-            value = o.value;
-            return *this;
-         }
-      };
+		HashItem& operator =(const HashItem& o)
+		{
+		    key = o.key;
+		    value = o.value;
+		    return *this;
+		}
+	    };
 
-   protected:
-      VectorT<HashItem, minSize> vector;
-      U fallback;
+	protected:
+	    VectorT<HashItem, minSize> vector;
+	    U fallback;
 
-   public:
-      HashT(U fallbk)
-      {
-         fallback = fallbk;
-      }
+	protected:
+	    static int comparer(const HashItem &a, const HashItem &b)
+	    {
+		return (a < b) ? -1 :
+		    (b < a) ? 1 : 0;
+	    }
 
-      virtual ~HashT()
-      {
-      }
+	public:
+	    HashT(U fallbk)
+	    {
+		fallback = fallbk;
+	    }
 
-      virtual int Count()
-      {
-         return vector.Count();
-      }
+	    virtual ~HashT()
+	    {
+	    }
 
-      virtual const T& GetKey(int i)
-      {
-         return vector[i].Key();
-      }
+	    virtual const T& GetKeyAt(int i) const
+	    {
+		return vector[i].Key();
+	    }
 
-      virtual void Add(T key, U val)
-      {
-         int index = vector.IndexOf(HashItem(key, val), 0);
-         if (index >= 0)
-         {
-            vector[index].SetValue(val);
-         }
-         else
-         {
-            vector.InsertSorted(HashItem(key, val), 0);
-         }
-      }
+	    virtual const U& GetValAt(int i) const
+	    {
+		return vector[i].Value();
+	    }
 
-      virtual const U& GetVal(T key)
-      {
-         HashItem item(key, fallback);
-         int index = vector.IndexOf(item, 0);
-         
-         if (index < 0)
-            return fallback;
-         return vector[index].Value();
-      }
-   };
+	    virtual iptr Count() const
+	    {
+		return vector.Count();
+	    }
+
+	    virtual void Remove(T key)
+	    {
+	    }
+
+	    virtual void Add(T key, U val)
+	    {
+		int32 index = vector.IndexOf(HashItem(key, val), &comparer);
+		if (index >= 0)
+		{
+		    vector[index].SetValue(val);
+		}
+		else
+		{
+		    vector.InsertSorted(HashItem(key, val), 0);
+		}
+	    }
+
+	    virtual const U& GetVal(T key) const
+	    {
+		HashItem item(key, fallback);
+		int index = vector.IndexOf(item, 0);
+
+		if (index < 0)
+		    return fallback;
+		return vector[index].Value();
+	    }
+	};
 };
 
 #endif

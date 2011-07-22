@@ -1,6 +1,6 @@
 /*
  * Amiga Generic Set - set of libraries and includes to ease sw development for all Amiga platforms
- * Copyright (C) 2001-2011 Tomasz Wiszkowski Tomasz.Wiszkowski at gmail.com.
+ * Copyright (C) 2004-2008 Tomasz Wiszkowski Tomasz.Wiszkowski at gmail.com.
  * 
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -22,15 +22,16 @@
 
 //#warning about to be obsoleted
 //#pragma obsolete
+#include "Types.h"
 
 namespace GenNS
 {
-   template <class T, long minSize=16>
+   template <class T, iptr minSize=16>
       class Vector 
    {
       T*          pElements;
-      long        lCurrentSize;
-      long        lTotalSize;
+      int32       lCurrentSize;
+      int32       lTotalSize;
       bool        bFreeOnDelete;
    public:
 
@@ -80,7 +81,7 @@ namespace GenNS
          {
             lTotalSize   <<= 1; // twice that much
             T* pNewElem    = new T[lTotalSize];
-            for (long i=0; i<lCurrentSize; i++)
+            for (int i=0; i<lCurrentSize; i++)
                pNewElem[i] = pElements[i];
             delete [] pElements;
             pElements      = pNewElem;
@@ -101,12 +102,12 @@ namespace GenNS
          return bFreeOnDelete;
       }
 
-      long Count() const
+      int32 Count() const
       {
          return lCurrentSize;
       }
 
-      long Max() const
+      int32 Max() const
       {
          return lTotalSize;
       }

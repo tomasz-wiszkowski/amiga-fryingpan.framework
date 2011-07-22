@@ -1,6 +1,6 @@
 /*
  * Amiga Generic Set - set of libraries and includes to ease sw development for all Amiga platforms
- * Copyright (C) 2001-2011 Tomasz Wiszkowski Tomasz.Wiszkowski at gmail.com.
+ * Copyright (C) 2004-2008 Tomasz Wiszkowski Tomasz.Wiszkowski at gmail.com.
  * 
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -31,17 +31,17 @@ namespace GenNS
       String                  sElemName;
       ConfigParser           *pParent;
       XMLElement             *pElement;
-      long                    lID;
+      iptr                    lID;
 
    public:
 
-      ConfigParser(ConfigParser* pParent, String sName, long lID=-1);
+      ConfigParser(ConfigParser* pParent, String sName, iptr lID=~0);
       virtual                ~ConfigParser(); 
       virtual XMLElement     *addChild(const char* sName);
       virtual const char     *getValue(const char* sName, const char* sDefault);
-      virtual long            getValue(const char* sName, long lDefault);
+      virtual iptr            getValue(const char* sName, iptr lDefault);
       virtual void            setValue(const char* sName, const char* sValue);
-      virtual void            setValue(const char* sName, long sValue);   
+      virtual void            setValue(const char* sName, iptr sValue);   
 
       XMLElement             *getElement();
 

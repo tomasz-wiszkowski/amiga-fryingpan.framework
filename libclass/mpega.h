@@ -1,6 +1,6 @@
 /*
  * Amiga Generic Set - set of libraries and includes to ease sw development for all Amiga platforms
- * Copyright (C) 2001-2011 Tomasz Wiszkowski Tomasz.Wiszkowski at gmail.com.
+ * Copyright (C) 2004-2008 Tomasz Wiszkowski Tomasz.Wiszkowski at gmail.com.
  * 
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -29,13 +29,13 @@ extern class MPEGAIFace *MPEGA;
 #include <libraries/mpega.h>
 
    BEGINDECL(MPEGA, "mpega.library")
-      FUNC2(MPEGA_STREAM*,    MPEGA_open,                            5, const char*,      fileName,      a0,   const MPEGA_CTRL*,            mpegaControl,  a1);
+      FUNC2(MPEGA_STREAM*,    MPEGA_open,                            5, const char*,      fileName,      a0,   const MPEGA_CTRL*,     mpegaControl,  a1);
       PROC1(                  MPEGA_close,                           6, MPEGA_STREAM*,    mpegaStream,   a0);
-      FUNC2(long,             MPEGA_decode_frame,                    7, MPEGA_STREAM*,    mpegaStream,   a0,   uint16**,                     mpegaPCM,      a1);
-      FUNC2(long,             MPEGA_seek,                            8, MPEGA_STREAM*,    mpegaStream,   a0,   unsigned long,                millis,        d0);
-      FUNC2(long,             MPEGA_time,                            9, MPEGA_STREAM*,    mpegaStream,   a0,   unsigned long*,               timePos,       a1);
-      FUNC2(long,             MPEGA_find_sync,                      10, unsigned char*,   buffer,        a0,   unsigned long,                length,        d0);
-      FUNC2(long,             MPEGA_scale,                          11, MPEGA_STREAM*,    mpegaStream,   a0,   unsigned long,                percent,       d0);
+      FUNC2(int32,            MPEGA_decode_frame,                    7, MPEGA_STREAM*,    mpegaStream,   a0,   uint16**,              mpegaPCM,      a1);
+      FUNC2(int32,            MPEGA_seek,                            8, MPEGA_STREAM*,    mpegaStream,   a0,   uint32,                millis,        d0);
+      FUNC2(int32,            MPEGA_time,                            9, MPEGA_STREAM*,    mpegaStream,   a0,   uint32*,               timePos,       a1);
+      FUNC2(int32,            MPEGA_find_sync,                      10, uint8*,		  buffer,        a0,   uint32,                length,        d0);
+      FUNC2(int32,            MPEGA_scale,                          11, MPEGA_STREAM*,    mpegaStream,   a0,   uint32,                percent,       d0);
 
 
    ENDDECL

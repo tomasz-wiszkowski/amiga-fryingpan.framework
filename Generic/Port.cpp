@@ -1,92 +1,87 @@
-/*
- * Amiga Generic Set - set of libraries and includes to ease sw development for all Amiga platforms
- * Copyright (C) 2001-2011 Tomasz Wiszkowski Tomasz.Wiszkowski at gmail.com.
- * 
- * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU Lesser General Public
- * License as published by the Free Software Foundation; either
- * version 2.1 of the License, or (at your option) any later version.
- * 
- * This library is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Lesser General Public License for more details.
- * 
- * You should have received a copy of the GNU Lesser General Public
- * License along with this library; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
- */
-
 #include "Port.h"
 #include "Msg.h"
+#include "DynList.h"
 #include <exec/ports.h>
 #include <utility/hooks.h>
 #include <libclass/exec.h>
 #include "LibrarySpool.h"
+#include <LibC/LibC.h>
 
 using namespace GenNS;
 
-Port::Port(const Hook *pHook) 
+#ifndef PF_SIGALLOC
+#define PF_SIGALLOC (1<<7) /* aros needs this. */
+#endif
+
+Port::Port(const ICall2T<void, const Port*, Msg*> *cb, int8 sig) :
+    call(cb)
 {
-   pPort = Exec->CreateMsgPort();
-   Handler = pHook;
+    EList::InitNode(&mp_Node);
+    EList::InitList(&mp_MsgList);
+    mp_Flags = PA_SIGNAL;
+
+    if (sig == -1)
+    {
+	mp_Flags |= PF_SIGALLOC;
+	mp_SigBit = Exec->AllocSignal(-1);
+    }
+    else
+    {
+	mp_SigBit = sig;
+    }
+    mp_SigTask = Exec->FindTask(0);
 }
 
 Port::~Port()
 {
-   MsgPort *pXPort = pPort;
-   pPort = 0;
-   
-   if (pXPort)
-   {
-      Message *pMsg;
-      while ((pMsg = Exec->GetMsg(pXPort)) != 0)
-      {
-         ((Msg*)pMsg->mn_Node.ln_Name)->Reply(0);
-      }
-      Exec->DeleteMsgPort(pXPort);
-   }
+    Message *pMsg;
+    while ((pMsg = Exec->GetMsg(this)) != 0)
+    {
+	static_cast<Msg*>(pMsg)->Reply();
+    }
+
+    if (mp_Flags & PF_SIGALLOC)
+    {
+	Exec->FreeSignal(mp_SigBit);
+    }
 }
 
-unsigned long Port::GetSignals()
+uint32 Port::GetSignals() const
 {
-   if (!pPort) return 0;
-   return (1<<pPort->mp_SigBit);
+    return (1<<mp_SigBit);
 }
 
-void Port::DoAsync(sint ACmd, void* AData)
+void Port::Send(Msg* m) const
 {
-   if (!pPort) return;
-   Exec->PutMsg(pPort, new Msg(false, ACmd, AData));
+    Exec->PutMsg(const_cast<MsgPort*>(static_cast<const MsgPort*>(this)), static_cast<Message*>(m));
 }
 
-unsigned long Port::DoSync(sint ACmd, void* AData)
+GenNS::Msg* Port::Recv() const
 {
-   unsigned long lRes = 0;
-   if (!pPort) return 0;
-   Msg *pMsg = new Msg(true, ACmd, AData);
-   Exec->PutMsg(pPort, pMsg);
-   lRes = pMsg->WaitFor();
-   delete pMsg;   
-   return lRes;
+    Message* m = Exec->GetMsg(const_cast<MsgPort*>(static_cast<const MsgPort*>(this)));
+    if (m == 0)
+	return 0;
+
+    return static_cast<Msg*>(m);
 }
 
-void Port::HandleSignals()
+void Port::HandleMsgs() const
 {
-   Message *pMessage;
-   if (pPort)
-   {
-      if (Handler.IsValid())
-      {
-         while(true)
-         {
-            pMessage = Exec->GetMsg(pPort);
-            if (pMessage == 0) 
-               break;
-            Msg *pMsg = (Msg*)pMessage->mn_Node.ln_Name;
-            uint lVal = Handler(pMsg->GetCommand(), pMsg->GetData());
-            pMsg->Reply(lVal);
-         }  
-      }  
-   }
+    GenNS::Msg *pMessage;
+
+    while(true)
+    {
+	pMessage = Recv();
+	if (pMessage == 0) 
+	    break;
+
+	if (call != 0)
+	    (*call)(this, pMessage);
+    }  
 }
+      
+void Port::WaitReady() const
+{
+    Exec->WaitPort(const_cast<MsgPort*>(static_cast<const MsgPort*>(this)));
+}
+

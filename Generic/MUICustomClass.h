@@ -1,6 +1,6 @@
 /*
  * Amiga Generic Set - set of libraries and includes to ease sw development for all Amiga platforms
- * Copyright (C) 2001-2011 Tomasz Wiszkowski Tomasz.Wiszkowski at gmail.com.
+ * Copyright (C) 2004-2008 Tomasz Wiszkowski Tomasz.Wiszkowski at gmail.com.
  * 
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -22,7 +22,6 @@
 
 #include "GenericMUI.h"
 #include "HookT.h"
-#include <intuition/classusr.h>
 #include "Registers.h"
 #include "LibrarySpool.h"
 #include <stdarg.h>
@@ -45,25 +44,25 @@ namespace GenNS
 
    private:
       void                      *getDispatcher();
-      virtual unsigned long      dispatch(IClass *cls, Object* obj, unsigned long *msg);
+      virtual iptr		dispatch(IClass *cls, iptr* obj, iptr *msg);
 
    protected:
       MUI_CustomClass           *pMUIClass;
-      IClass                    *pClass;
+      struct IClass             *pClass;
 
    public:
       MUICustomClass(const char *parent);
       virtual                   ~MUICustomClass();
-      Object                    *Create(unsigned long lTag1, ...);
+      iptr                      *Create(iptr lTag1, ...);
 
    private:
 #if defined (__AROS__) || defined (__AMIGAOS4__)
-      static unsigned long       FDispatchCaller(IClass *pClass, Object* pObject, unsigned long *pMessage);
+      static iptr       FDispatchCaller(IClass *pClass, iptr* pObject, iptr *pMessage);
 #elif defined (__MORPHOS__)
-      static unsigned long       FDispatchCallerFunc();
-      static const unsigned long FDispatchCaller[2];
+      static iptr       FDispatchCallerFunc();
+      static const iptr FDispatchCaller[2];
 #elif defined (__mc68000)
-      static unsigned long       FDispatchCaller();
+      static iptr       FDispatchCaller();
 #endif
    };
 };

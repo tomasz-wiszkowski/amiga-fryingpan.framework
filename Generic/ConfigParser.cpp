@@ -1,6 +1,6 @@
 /*
  * Amiga Generic Set - set of libraries and includes to ease sw development for all Amiga platforms
- * Copyright (C) 2001-2011 Tomasz Wiszkowski Tomasz.Wiszkowski at gmail.com.
+ * Copyright (C) 2004-2008 Tomasz Wiszkowski Tomasz.Wiszkowski at gmail.com.
  * 
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -24,7 +24,7 @@ ConfigParser::~ConfigParser()
 {
 }
 
-ConfigParser::ConfigParser(ConfigParser *pParent, String sName, long lID)
+ConfigParser::ConfigParser(ConfigParser *pParent, String sName, iptr lID)
 {
    sElemName = sName;         // set element name
    this->pParent = pParent;   // set parent element
@@ -45,7 +45,7 @@ const char *ConfigParser::getValue(const char* sName, const char *sDefault)
    return pElem->GetValue().Data();
 }
 
-long ConfigParser::getValue(const char* sName, long lDefault)
+iptr ConfigParser::getValue(const char* sName, iptr lDefault)
 {
    if (0 == pElement)
       return lDefault;
@@ -71,7 +71,7 @@ void ConfigParser::setValue(const char* sName, const char* sValue)
    pElem->SetValue(sValue);
 }
 
-void ConfigParser::setValue(const char* sName, long sValue)
+void ConfigParser::setValue(const char* sName, iptr sValue)
 {
    if (0 == pElement)
       return;
@@ -102,7 +102,7 @@ void ConfigParser::locateElement()
          XMLElement *pElem = pParent->pElement->GetChild(i);
          if (pElem->GetName().Equals(sElemName))
          {
-            if (lID == -1)
+            if (lID == (iptr)~0)
             {
                pElement = pElem;
                return;
@@ -112,7 +112,7 @@ void ConfigParser::locateElement()
                XMLAttribute *pAttr = pElem->FindAttribute("id");
                if (pAttr)
                {
-                  if (pAttr->GetValue().ToLong() == lID)
+                  if (pAttr->GetValue().ToLong() == (int32)lID)
                   {
                      pElement = pElem;
                      return;
@@ -123,7 +123,7 @@ void ConfigParser::locateElement()
       }
       
       pElement = pParent->addChild(sElemName);
-      if (-1 != lID)
+      if ((iptr)~0 != lID)
       {
          pElement->AddAttribute("id", lID);
       }

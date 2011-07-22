@@ -1,6 +1,6 @@
 /*
  * Amiga Generic Set - set of libraries and includes to ease sw development for all Amiga platforms
- * Copyright (C) 2001-2011 Tomasz Wiszkowski Tomasz.Wiszkowski at gmail.com.
+ * Copyright (C) 2004-2008 Tomasz Wiszkowski Tomasz.Wiszkowski at gmail.com.
  * 
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -51,7 +51,7 @@ struct RastPort;
       PROC0(                  private1,                              6);
 #endif
       PROC1(                  ReleaseDataType,                       7, DataType*,  dt,         a0);
-      FUNC2(Object*,          NewDTObjectA,                          8, void*,      name,       d0, TagItem*,  tags,       a0);
+      FUNC2(Object*,          NewDTObjectA,                          8, const void*,name,       d0, TagItem*,  tags,       a0);
 #ifdef __AMIGAOS4__
       PROC0(                  private2,                              8);
 #endif
@@ -71,12 +71,12 @@ struct RastPort;
       PROC0(                  private6,                             13);
 #endif
       FUNC2(uint32,           DoAsyncLayout,                        14, Object*,    obj,        a0, gpLayout*, layout,     a1);
-      FUNC4(uint32,           DoDTMethodA,                          15, Object*,    obj,        a0, Window*,   win,        a1, Requester*, req,       a2, uint32*,      message, a3);
+      FUNC4(uint32,           DoDTMethodA,                          15, Object*,    obj,        a0, Window*,   win,        a1, Requester*, req,       a2, iptr*,      message, a3);
 #ifdef __AMIGAOS4__
       PROC0(                  private7,                             15);
 #endif
       FUNC2(int32,            RemoveDTObject,                       16, Window*,    win,        a0, Object*,   obj,        a1);
-      FUNC1(uint32*,          GetDTMethods,                         17, Object*,    obj,        a0);
+      FUNC1(iptr*,            GetDTMethods,                         17, Object*,    obj,        a0);
       FUNC1(DTMethods*,       GetDTTriggerMethods,                  18, Object*,    obj,        a0);
       FUNC4(uint32,           PrintDTObjectA,                       19, Object*,    obj,        a0, Window*,   win,        a1, Requester*, req,       a2, dtPrint*,     print,   a3);
 #ifdef __AMIGAOS4__

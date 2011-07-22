@@ -1,6 +1,6 @@
 /*
  * Amiga Generic Set - set of libraries and includes to ease sw development for all Amiga platforms
- * Copyright (C) 2001-2011 Tomasz Wiszkowski Tomasz.Wiszkowski at gmail.com.
+ * Copyright (C) 2004-2008 Tomasz Wiszkowski Tomasz.Wiszkowski at gmail.com.
  * 
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -102,19 +102,19 @@ namespace GenNS
       };
 
    protected:
+      HookT<NetService, Thread*, void*> hHkProc;
+      HookT<NetService, uint32, void*>  hHkEvent;
+
+   protected:
       static int32            stTrue;
       static int32            stFalse;
 
-      unsigned long           lThreadSignal;
-      Thread                 *pSocketThread;
+      iptr           lThreadSignal;
+      Thread                  thread;
       RWSync                  hRWSync;
       BSDSocketIFace         *bsock;
       int32                   error;
       VectorT<Socket*>        hSockets;
-
-   protected:
-      HookT<NetService, Thread*, void*> hHkProc;
-      HookT<NetService, uint32, void*>  hHkEvent;
 
 
    protected:
@@ -134,8 +134,8 @@ namespace GenNS
       virtual Socket            *FGetSocket(int32 skt);
 
    protected:  /* process */
-      virtual unsigned long      FSocketProc(Thread*, void*);
-      virtual unsigned long      FProcCommands(unsigned long ACmd, void* AData);
+      virtual iptr      FSocketProc(Thread*, void*);
+      virtual iptr      FProcCommands(iptr ACmd, void* AData);
    public:
       NetService();
       virtual                   ~NetService();  

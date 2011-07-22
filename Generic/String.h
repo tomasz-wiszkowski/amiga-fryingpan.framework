@@ -1,6 +1,6 @@
 /*
  * Amiga Generic Set - set of libraries and includes to ease sw development for all Amiga platforms
- * Copyright (C) 2001-2011 Tomasz Wiszkowski Tomasz.Wiszkowski at gmail.com.
+ * Copyright (C) 2004-2008 Tomasz Wiszkowski Tomasz.Wiszkowski at gmail.com.
  * 
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -20,7 +20,12 @@
 #ifndef _GEN_STRING_H_
 #define _GEN_STRING_H_
 
+#ifndef __linux__
 #include <dos/dos.h>
+#else
+typedef const char* BSTR;
+#endif
+
 #include "Types.h"
 #include "VectorT.h"
 
@@ -32,8 +37,8 @@ namespace GenNS
 {
    class String 
    {
-      unsigned long  lMaxLen;
-      unsigned long  lLength;
+      uint32 lMaxLen;
+      uint32 lLength;
       unsigned char *sContents;
 
    protected:
@@ -47,9 +52,9 @@ namespace GenNS
       void           Assign(const char *s);
       void           Assign(const String *s);
       int            Length(void) const;
-      void           SetLength(unsigned long lLength);                  // sets length of element + adds pad zero
+      void           SetLength(iptr lLength);                  // sets length of element + adds pad zero
       void           Update();                                          // recalc length
-      int            FormatStr(char *sFmtStr, void*pParams);
+      int            FormatStr(const char *sFmtStr, void*pParams);
       operator char*() const;
       operator unsigned char*() const;
       String        &operator =  (const String & sStr);
@@ -62,23 +67,24 @@ namespace GenNS
       int            operator < (const char* sStr) const;
       int            operator == (const String sStr) const;
       int            operator == (const char *sStr) const;
-      bool           Equals(const char* sOther);
-      bool           EqualsIgnoreCase(const char* sOther);
+      bool           Equals(const char* sOther) const;
+      bool           EqualsIgnoreCase(const char* sOther) const;
       int            Compare(const char* sOther) const;
       int            CompareIgnoreCase(const char* sOther) const;
-      char          &operator [] (int lOffset);
+      const char     operator [] (int lOffset) const;
+      char	    &operator [] (int lOffset);
       void           AddPath(const char* sElement);
 
       void           AllocBuf(unsigned int lSize);
       void           ReallocBuf(unsigned int lSize);
 
-      unsigned long  TrimChars(char* sChars);
+      iptr  TrimChars(char* sChars);
       int32          ToLong();
       int64          ToQuad();
-      String         SubString(int lFirst, int lLen);
+      String         SubString(int lFirst, int lLen) const;
       String        &Substitute(const char* src, const char* dst);
-      String         LeftString(int lLen);
-      String         RightString(int lLen);
+      String         LeftString(int lLen) const;
+      String         RightString(int lLen) const;
 
       String        &UpperCase();
       String        &LowerCase();
@@ -89,7 +95,8 @@ namespace GenNS
       String        &ToUTF8();
       String        &FromUTF8();
 
-      VectorT<String> Explode(); // splits string into words "and phrases"
+      VectorT<String> Explode() const; // splits string into words "and phrases"
+      //VectorT<String> Explode(const char separators[]) const; // splits string into words "and phrases"
 
    };
 

@@ -1,6 +1,6 @@
 /*
  * Amiga Generic Set - set of libraries and includes to ease sw development for all Amiga platforms
- * Copyright (C) 2001-2011 Tomasz Wiszkowski Tomasz.Wiszkowski at gmail.com.
+ * Copyright (C) 2004-2008 Tomasz Wiszkowski Tomasz.Wiszkowski at gmail.com.
  * 
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -100,7 +100,7 @@ typedef void* AVLKey;
       FUNC2(void *,           AllocVecPooled, 0, void *, poolHeader, a0, uint32, size, a1);
       FUNC1(uint32,           AvailMem, 36, uint32, attributes, d1);
       PROC3(                  CopyMem, 104, void *, source, a0, void *, dest, a1, uint32, size, d0);
-      PROC3(                  CopyMemQuick, 105, uint32 *, source, a0, uint32 *, dest, a1, uint32, size, d0);
+      PROC3(                  CopyMemQuick, 105, void *, source, a0, void *, dest, a1, uint32, size, d0);
       FUNC3(void *,           CreatePool, 116, uint32, memFlags, d0, uint32, puddleSize, d1, uint32, threshSize, d2);
       PROC3(                  Deallocate, 32, MemHeader *, memHeader, a0, void *, memoryBlock, a1, uint32, byteSize, d0);
       PROC1(                  DeletePool, 117, void *, poolHeader, a0);
@@ -270,7 +270,7 @@ typedef void* AVLKey;
       FUNC2(uint32,           ItemPoolControl, 0, void *, itemPool, a0, const TagItem *, tagList, a1);
       PROC0(                  dummy13, 0);
 // some morphos enhancements 
-      FUNC4(void*,            NewSetFunction, 132, Library*, lib, a0, void*, call, a1, sint, offset, d0, const TagItem*, tags, a2);
+      FUNC4(void*,            NewSetFunction, 132, Library*, lib, a0, void*, call, a1, iptr, offset, d0, const TagItem*, tags, a2);
    ENDDECL
 
 #endif /*_EXECIFACE_H_*/

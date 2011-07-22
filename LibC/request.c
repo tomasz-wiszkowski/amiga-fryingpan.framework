@@ -1,6 +1,6 @@
 /*
  * Amiga Generic Set - set of libraries and includes to ease sw development for all Amiga platforms
- * Copyright (C) 2001-2011 Tomasz Wiszkowski Tomasz.Wiszkowski at gmail.com.
+ * Copyright (C) 2004-2008 Tomasz Wiszkowski Tomasz.Wiszkowski at gmail.com.
  * 
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -20,10 +20,9 @@
 #include "LibC.h"
 #include <proto/intuition.h>
 
-int32 request(const char* title, const char* message, const char* gadgets, const iptr params)
+int32 request(const char* title, const char* message, const char* gadgets, const iptr *params)
 {
-   // 20! really 20 -- OS4 has some extra fields, and i am preserving space.
-   const unsigned long es[] = { 20, 0, (unsigned long)title, (unsigned long)message, (unsigned long)gadgets};
+   const iptr es[] = { 20, 0, (iptr)title, (iptr)message, (iptr)gadgets};
 #ifndef __amigaos4__
    register struct Library *IntuitionBase = __InternalIntuitionBase;
    if (__InternalIntuitionBase)
@@ -33,6 +32,6 @@ int32 request(const char* title, const char* message, const char* gadgets, const
       return __InternalIntuitionIFace->EasyRequestArgs(0, (struct EasyStruct*)&es, 0, (void*)params);
 #endif
 
-   return 0;
+   return -1;
 };
 

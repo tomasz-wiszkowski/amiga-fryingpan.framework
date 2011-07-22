@@ -1,6 +1,6 @@
 /*
  * Amiga Generic Set - set of libraries and includes to ease sw development for all Amiga platforms
- * Copyright (C) 2001-2011 Tomasz Wiszkowski Tomasz.Wiszkowski at gmail.com.
+ * Copyright (C) 2004-2008 Tomasz Wiszkowski Tomasz.Wiszkowski at gmail.com.
  * 
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -26,7 +26,7 @@
 
 struct LibInitStruct
 {
-   unsigned long  LibSize;
+   iptr  LibSize;
    void          *FuncTable;
    void          *DataTable;
    void           (*InitFunc)(void);
@@ -40,9 +40,9 @@ extern "C"
 
    struct Library               *LIB_Init(void);
    struct Library               *LIB_Open(void);
-   uint                          LIB_Close(void);
-   uint                          LIB_Expunge(void);
-   uint                          LIB_Reserved(void);
+   iptr                          LIB_Close(void);
+   iptr                          LIB_Expunge(void);
+   iptr                          LIB_Reserved(void);
    extern struct LibInitStruct   LIB_InitStruct;
 
 #ifdef __cplusplus
@@ -69,15 +69,15 @@ extern "C"
    };      
 
 #define LIB_FT_Begin                            \
-   uint LIB_FuncTable[] =                       \
+   iptr LIB_FuncTable[] =                       \
    {                                            \
-      (uint) &LIB_Open,                         \
-      (uint) &LIB_Close,                        \
-      (uint) &LIB_Expunge,                      \
-      (uint) &LIB_Reserved,
+      (iptr) &LIB_Open,                         \
+      (iptr) &LIB_Close,                        \
+      (iptr) &LIB_Expunge,                      \
+      (iptr) &LIB_Reserved,
 // }      
 
-#define LIB_FT_Function(f) (uint) &__gateway__##f,
+#define LIB_FT_Function(f) (iptr) &__gateway__##f,
 
 // { LIB_FT_End
 #define LIB_FT_End                              \

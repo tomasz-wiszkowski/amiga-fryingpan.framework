@@ -1,6 +1,6 @@
 /*
  * Amiga Generic Set - set of libraries and includes to ease sw development for all Amiga platforms
- * Copyright (C) 2001-2011 Tomasz Wiszkowski Tomasz.Wiszkowski at gmail.com.
+ * Copyright (C) 2004-2008 Tomasz Wiszkowski Tomasz.Wiszkowski at gmail.com.
  * 
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -17,6 +17,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
+#ifndef __linux__
 #include "GenericOOP.h"
 #include "LibrarySpool.h"
 #include <libclass/exec.h>
@@ -27,70 +28,70 @@
 
 using namespace GenNS;
 
-uint32 GenericOOP::DoMtd(uint32* pObject, uint32 *pMsg)
+iptr GenericOOP::DoMtd(iptr *pObject, iptr *pMsg)
 {
-   return Utility->CallHookPkt((const Hook*)OCLASS(pObject), pObject, pMsg);
+   return Utility->CallHookPkt((const Hook*)OCLASS(pObject), (void*)pObject, pMsg);
 }
 
-uint32 GenericOOP::DoSuperMtd(IClass *pClass, uint32* pObject, uint32 *pMsg)
+iptr GenericOOP::DoSuperMtd(IClass *pClass, iptr *pObject, iptr *pMsg)
 {
-   return Utility->CallHookPkt((Hook*)pClass->cl_Super, pObject, pMsg);
+   return Utility->CallHookPkt((Hook*)pClass->cl_Super, (void*)pObject, pMsg);
 }
 
-uint32 *GenericOOP::NewObj(char* Name, uint32 FirstTag, ...)          // me hates mos for that.
+iptr *GenericOOP::NewObj(char* Name, iptr FirstTag, ...)          // me hates mos for that.
 {
    va_list ap;
-   uint32 *params = new uint32 [128];
-   int pos = 0;
+   iptr *params = new iptr [128];
+   iptr pos = 0;
    va_start(ap, FirstTag);
       
    params[pos] = FirstTag;
    while (params[pos++] != 0)
    {
-      params[pos++] = va_arg(ap, unsigned long);
-      params[pos] = va_arg(ap, unsigned long);         
+      params[pos++] = va_arg(ap, iptr);
+      params[pos] = va_arg(ap, iptr);         
       ASSERT(pos < 128);
    }
 
-   pos = (int)Intuition->NewObjectA(0, Name, (struct TagItem*)params);
+   pos = (iptr)Intuition->NewObjectA(0, Name, (struct TagItem*)params);
    delete [] params;
-   return (uint32*)pos;
+   return (iptr*)pos;
 }
 
-uint32 *GenericOOP::NewObj(Class* cls, uint32 FirstTag, ...)          // me hates mos for that.
+iptr *GenericOOP::NewObj(Class* cls, iptr FirstTag, ...)          // me hates mos for that.
 {
    va_list ap;
-   uint32 *params = new uint32 [128];
-   int pos = 0;
+   iptr *params = new iptr [128];
+   iptr pos = 0;
    va_start(ap, FirstTag);
       
    params[pos] = FirstTag;
    while (params[pos++] != 0)
    {
-      params[pos++] = va_arg(ap, unsigned long);
-      params[pos] = va_arg(ap, unsigned long);         
+      params[pos++] = va_arg(ap, iptr);
+      params[pos] = va_arg(ap, iptr);         
       ASSERT(pos < 128);
    }
 
-   pos = (int)Intuition->NewObjectA((IClass*)cls, 0, (struct TagItem*)params);
+   pos = (iptr)Intuition->NewObjectA((IClass*)cls, 0, (struct TagItem*)params);
    
    delete [] params;
-   return (uint32*)pos;
+   return (iptr*)pos;
 }
 
-void GenericOOP::DisposeObj(uint32 *obj)
+void GenericOOP::DisposeObj(iptr *obj)
 {
-   Intuition->DisposeObject(obj);
+   Intuition->DisposeObject((void*)obj);
 }
 
-void GenericOOP::AddChildObj(uint32 *parent, uint32 *child)
+void GenericOOP::AddChildObj(iptr *parent, iptr *child)
 {
-   DoMtd(parent, ARRAY(OM_ADDMEMBER, (uint32)child));
+   DoMtd(parent, ARRAY(OM_ADDMEMBER, (iptr)child));
 }
 
-void GenericOOP::RemChildObj(uint32 *parent, uint32 *child)
+void GenericOOP::RemChildObj(iptr *parent, iptr *child)
 {
-   DoMtd(parent, ARRAY(OM_REMMEMBER, (uint32)child));
+   DoMtd(parent, ARRAY(OM_REMMEMBER, (iptr)child));
 }
 
 GenericOOP::~GenericOOP()
@@ -102,3 +103,4 @@ GenericOOP::GenericOOP()
    ASSERTS(Utility != 0, "Please create library spool!");
 }
 
+#endif /* __linux__ */

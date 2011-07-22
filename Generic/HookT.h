@@ -1,6 +1,6 @@
 /*
  * Amiga Generic Set - set of libraries and includes to ease sw development for all Amiga platforms
- * Copyright (C) 2001-2011 Tomasz Wiszkowski Tomasz.Wiszkowski at gmail.com.
+ * Copyright (C) 2004-2008 Tomasz Wiszkowski Tomasz.Wiszkowski at gmail.com.
  * 
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -43,16 +43,16 @@ namespace GenNS
    {
    public:
       /**
-       * \typedef uint (BaseClass::*TCall)(Arg1 a1, Arg2 a2)
+       * \typedef iptr (BaseClass::*TCall)(Arg1 a1, Arg2 a2)
        * \brief This specifies a type of the nonvirtual method that can be called by the specialized class when hook fires. You usually should have no interest in this.
        */
-      typedef uint(BaseClass::*TCall)(Arg1 a1, Arg2 a2);
+      typedef iptr(BaseClass::*TCall)(Arg1 a1, Arg2 a2);
 
       /**
-       * \typedef uint (*TStaticCall)(Arg1 a1, Arg2 a2)
+       * \typedef iptr (*TStaticCall)(Arg1 a1, Arg2 a2)
        * \brief This specifies a type of the static method or function that can be called by the specialized class when hook fires. You usually should have no interest in this.
        */
-      typedef uint(*TStaticCall)(Arg1 a1, Arg2 a2);
+      typedef iptr(*TStaticCall)(Arg1 a1, Arg2 a2);
    
    private:
 
@@ -62,7 +62,7 @@ namespace GenNS
 
    public:
 
-      virtual uint Call(uint a1, uint a2)
+      virtual iptr Call(iptr a1, iptr a2)
       {
          if (0 != baseClass)
          {
@@ -90,7 +90,7 @@ namespace GenNS
        *       hook.Initialize(this, &myHookCall::call);
        *    }
        *
-       *    uint call(someClass1* a1, someClass2* a2)
+       *    iptr call(someClass1* a1, someClass2* a2)
        *    {
        *       // ...
        *       return 0;
@@ -119,7 +119,7 @@ namespace GenNS
        *       hook.InitializeStatic(&myHookCall::call);
        *    }
        *
-       *    static uint call(someClass1* a1, someClass2* a2)
+       *    static iptr call(someClass1* a1, someClass2* a2)
        *    {
        *       // ...
        *       return 0;
@@ -148,7 +148,7 @@ namespace GenNS
        *    {
        *    }
        *
-       *    uint call(someClass1* a1, someClass2* a2)
+       *    iptr call(someClass1* a1, someClass2* a2)
        *    {
        *       // ...
        *       return 0;
@@ -175,7 +175,7 @@ namespace GenNS
        *    {
        *    }
        *
-       *    static uint call(someClass1* a1, someClass2* a2)
+       *    static iptr call(someClass1* a1, someClass2* a2)
        *    {
        *       // ...
        *       return 0;

@@ -1,6 +1,6 @@
 /*
  * Amiga Generic Set - set of libraries and includes to ease sw development for all Amiga platforms
- * Copyright (C) 2001-2011 Tomasz Wiszkowski Tomasz.Wiszkowski at gmail.com.
+ * Copyright (C) 2004-2008 Tomasz Wiszkowski Tomasz.Wiszkowski at gmail.com.
  * 
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -17,47 +17,47 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
+#ifndef __linux__
 #include "GenericMUI.h"
 #include "LibrarySpool.h"
 #include <intuition/classes.h>
 #include <stdarg.h>
 #include <libclass/utility.h>
 #include <libclass/intuition.h>
-#include <intuition/classusr.h>
 #include "Debug.h"
 
 using namespace GenNS;
 
-Object *GenericMUI::MUI_MakeObjectX(long Name, ...)
+iptr *GenericMUI::MUI_MakeObjectX(iptr Name, ...)
 {
    va_list ap;
-   unsigned long *params = new unsigned long [128];
+   iptr *params = new iptr [128];
    int pos = 0;
    va_start(ap, Name);
       
-   while ((params[pos++] = va_arg(ap, unsigned long)) != 0)
+   while ((params[pos++] = va_arg(ap, iptr)) != 0)
    {
-      params[pos++] = va_arg(ap, unsigned long);
+      params[pos++] = va_arg(ap, iptr);
       ASSERT(pos < 128);
    }
       
-   pos = (int)MUIMaster->MUI_MakeObjectA(Name, (unsigned long*)params);
+   pos = (int)MUIMaster->MUI_MakeObjectA(Name, (iptr*)params);
    delete [] params;
    return (Object*)pos;
 }
    
-Object *GenericMUI::MUI_NewObject(char* Name, unsigned long FirstTag, ...)          // me hates mos for that.
+iptr *GenericMUI::MUI_NewObject(char* Name, iptr FirstTag, ...)          // me hates mos for that.
 {
    va_list ap;
-   unsigned long *params = new unsigned long [128];
+   iptr *params = new iptr [128];
    int pos = 0;
    va_start(ap, FirstTag);
       
    params[pos] = FirstTag;
    while (params[pos++] != 0)
    {
-      params[pos++] = va_arg(ap, unsigned long);
-      params[pos] = va_arg(ap, unsigned long);         
+      params[pos++] = va_arg(ap, iptr);
+      params[pos] = va_arg(ap, iptr);         
       ASSERT(pos < 128);
    }
       
@@ -66,6 +66,6 @@ Object *GenericMUI::MUI_NewObject(char* Name, unsigned long FirstTag, ...)      
    return (Object*)pos;
 }
   
-   
+#endif /* __linux__ */   
    
 
