@@ -1,0 +1,7 @@
+/bin-os3
+/bin-os4
+/bin-mos
+/bin-aros
+/bin-linux
+cscope\..*
+.*~$
